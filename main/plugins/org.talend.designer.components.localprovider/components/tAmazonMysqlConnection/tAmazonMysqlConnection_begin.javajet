@@ -15,15 +15,19 @@ imports="
 <%
 			if(dbproperties == null || ("\"\"").equals(dbproperties) || ("").equals(dbproperties)) {
 %>
-		String url_<%=cid%> = "jdbc:mysql://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + "rewriteBatchedStatements=true";
+		String url_<%=cid%> = "jdbc:mysql://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + "rewriteBatchedStatements=true&enabledTLSProtocols=TLSv1.2,TLSv1.1,TLSv1";
 <%
 			} else {
 %>
 		String proprtties_<%=cid%> = <%=dbproperties%>;
 		if (proprtties_<%=cid%> == null || proprtties_<%=cid%>.trim().length() == 0) {
-			proprtties_<%=cid%> += "rewriteBatchedStatements=true";
+			proprtties_<%=cid%> += "rewriteBatchedStatements=true&enabledTLSProtocols=TLSv1.2,TLSv1.1,TLSv1";
 		}else if (proprtties_<%=cid%> != null && !proprtties_<%=cid%>.contains("rewriteBatchedStatements")) {
 			proprtties_<%=cid%> += "&rewriteBatchedStatements=true";
+		}
+		
+		if (proprtties_<%=cid%> != null && !proprtties_<%=cid%>.contains("enabledTLSProtocols=")) {
+			proprtties_<%=cid%> += "&enabledTLSProtocols==TLSv1.2,TLSv1.1,TLSv1";
 		}
 		
 		String url_<%=cid%> = "jdbc:mysql://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + proprtties_<%=cid%>;

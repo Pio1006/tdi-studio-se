@@ -182,11 +182,14 @@ if(useExistingConnection) {
 		String dbProperties_<%=cid%> = <%=dbproperties%>;
 		String url_<%=cid%> = null;
 		if(dbProperties_<%=cid%> == null || dbProperties_<%=cid%>.trim().length() == 0) {
-			url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + "rewriteBatchedStatements=true";
+			url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + "rewriteBatchedStatements=true&enabledTLSProtocols=TLSv1.2,TLSv1.1,TLSv1";
 		} else {
 			String properties_<%=cid%> = <%=dbproperties%>;
 			if (!properties_<%=cid%>.contains("rewriteBatchedStatements")) {
 				properties_<%=cid%> += "&rewriteBatchedStatements=true";
+			}
+			if (!properties_<%=cid%>.contains("enabledTLSProtocols=")) {
+				properties_<%=cid%> += "&enabledTLSProtocols=TLSv1.2,TLSv1.1,TLSv1";
 			}
 
 			url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + properties_<%=cid%>;

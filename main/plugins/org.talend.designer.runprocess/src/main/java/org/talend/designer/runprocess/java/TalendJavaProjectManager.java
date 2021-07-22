@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -735,6 +736,82 @@ public class TalendJavaProjectManager {
         AggregatorPomsHelper.addToParentModules(
                 AggregatorPomsHelper.getItemPomFolder(item.getProperty()).getFile(TalendMavenConstants.POM_FILE_NAME),
                 item.getProperty(), checkFilter);
+    }
+    
+    public static void doDeleteSingleVersionTalendJobProject(String id, String deleteVersion, boolean deleteContent, boolean avoidRefresh)
+            throws Exception {
+        List<IRepositoryViewObject> allVersionObjects = ProxyRepositoryFactory.getInstance().getAllVersion(id);
+        for (IRepositoryViewObject object : allVersionObjects) {
+            String realVersion = object.getVersion();
+            if (!StringUtils.equals(realVersion, deleteVersion)) continue;
+            Property property = object.getProperty();
+            String currentName = property.getLabel();
+            if (property.getItem() instanceof JobletProcessItem) {
+                BuildCacheManager.getInstance().removeJobletCache(property);
+            } else {
+                BuildCacheManager.getInstance().preRemoveJobCache(property);
+            }
+            IFile pomFile = AggregatorPomsHelper.getItemPomFolder(property, realVersion)
+                    .getFile(TalendMavenConstants.POM_FILE_NAME);
+            AggregatorPomsHelper.removeFromParentModules(pomFile);
+        }
+        Set<String> removedVersions = new HashSet<>();
+        Iterator<String> iterator = talendJobJavaProjects.keySet().iterator();
+        // delete exist project
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            if (key.contains(id) && key.contains(deleteVersion)) {
+                ITalendProcessJavaProject projectToDelete = talendJobJavaProjects.get(key);
+                if (projectToDelete.exists()) {
+                    projectToDelete.getProject().delete(deleteContent, true, null);
+                }
+                String version = key.split("\\|")[1]; //$NON-NLS-1$
+                removedVersions.add(version);
+                iterator.remove();
+            }
+        }
+        if (deleteContent) {
+            // for logically deleted project, delete the folder directly
+            AggregatorPomsHelper helper = new AggregatorPomsHelper();
+            for (IRepositoryViewObject object : allVersionObjects) {
+                String realVersion = object.getVersion();
+                if (!StringUtils.equals(realVersion, deleteVersion)) continue;
+                Property property = object.getProperty();
+                String currentName = property.getLabel();
+                try {
+                    IPath jobPath = AggregatorPomsHelper.getItemPomFolder(property, realVersion).getLocation();
+                    if (!removedVersions.contains(realVersion)) {
+                        File projectFolder = jobPath.toFile();
+                        if (projectFolder.exists()) {
+                            FilesUtils.deleteFolder(projectFolder, true);
+                        }
+                    }
+                } finally {
+                   
+                }
+            }
+            if (!avoidRefresh) {
+                helper.getProjectPomsFolder().refreshLocal(IResource.DEPTH_INFINITE, null);
+            }
+        }
+    }
+    
+    public static void deleteOldVersionTalendJobProject(String id, String version, boolean deleteContent) {
+
+        RepositoryWorkUnit workUnit = new RepositoryWorkUnit<Object>("Delete job projects") { //$NON-NLS-1$
+
+            @Override
+            protected void run() {
+                try {
+                    doDeleteSingleVersionTalendJobProject(id, version, deleteContent, false);
+                } catch (Exception e) {
+                    ExceptionHandler.process(e);
+                }
+            }
+        };
+        workUnit.setAvoidUnloadResources(true);
+        ProxyRepositoryFactory.getInstance().executeRepositoryWorkUnit(workUnit);
+
     }
 
 }

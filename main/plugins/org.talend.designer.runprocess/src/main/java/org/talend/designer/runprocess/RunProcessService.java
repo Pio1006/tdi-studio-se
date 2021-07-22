@@ -551,4 +551,10 @@ public class RunProcessService implements IRunProcessService {
         delegateService.deleteTalendCodesJarProject(type, projectTechName, codesJarName, deleteContent);
     }
 
+    @Override
+    public void deleteOldVersionTalendJobProject(String id, String version) {
+        // TODO Auto-generated method stub
+        delegateService.deleteOldVersionTalendJobProject(id, version);
+    }
+
 }

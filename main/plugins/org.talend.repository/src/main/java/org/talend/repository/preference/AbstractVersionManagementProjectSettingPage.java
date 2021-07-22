@@ -174,7 +174,7 @@ public abstract class AbstractVersionManagementProjectSettingPage extends Projec
     /**
      * repository tree viewer.
      */
-    private void addRepositoryTreeViewer(Composite leftComposite) {
+    protected void addRepositoryTreeViewer(Composite leftComposite) {
         GridData gridData = new GridData(GridData.FILL_BOTH);
         gridData.widthHint = 210;
         gridData.heightHint = 400;

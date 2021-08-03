@@ -64,23 +64,10 @@ public class BigDataJobUtil {
         if (isBDJobWithFramework(ERepositoryObjectType.PROCESS_MR, HadoopConstants.FRAMEWORK_SPARK)
                 || isBDJobWithFramework(ERepositoryObjectType.PROCESS_STORM, HadoopConstants.FRAMEWORK_SPARKSTREAMING)) {
             List<? extends IElementParameter> parameters = process.getElementParametersWithChildrens();
-            boolean modeParameterVisited = false;
             for (IElementParameter pt : parameters) {
-                if (pt.getName().equals("SPARK_LOCAL_MODE")) { //$NON-NLS-1$
-                    modeParameterVisited = true;
-                    if ("true".equals(pt.getValue())) { //$NON-NLS-1$
-                        isSparkWithHDInsight = false;
-                        break;
-                    }
-                }
                 if (pt.getName().equals("DISTRIBUTION") //$NON-NLS-1$
                         && EHadoopDistributions.MICROSOFT_HD_INSIGHT.getName().equals(pt.getValue())) {
                     isSparkWithHDInsight = true;
-                    // If the SPARK_LOCAL_MODE parameter already have been processed and if we continue to loop,
-                    // that means we are not in a LOCAL mode context. We can break the loop.
-                    if (modeParameterVisited) {
-                        break;
-                    }
                 }
             }
         }

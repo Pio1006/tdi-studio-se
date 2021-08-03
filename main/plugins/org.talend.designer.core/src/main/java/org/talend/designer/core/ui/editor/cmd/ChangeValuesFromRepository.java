@@ -235,14 +235,9 @@ public class ChangeValuesFromRepository extends ChangeMetadataCommand {
                             || ComponentCategory.CATEGORY_4_SPARKSTREAMING.getName()
                                     .equals(((IProcess) elem).getComponentsType())) {
                         if (EmfComponent.REPOSITORY.equals(value)) {
-                            IElementParameter sparkLocalParam = ((IProcess) elem)
-                                    .getElementParameter(HadoopConstants.SPARK_LOCAL_MODE);
                             IElementParameter sparkParam = ((IProcess) elem).getElementParameter(HadoopConstants.SPARK_MODE);
-                            if (sparkLocalParam != null && (Boolean) (sparkLocalParam.getValue())) {
-                                sparkLocalParam.setValue(false);
-                            }
-                            if (sparkParam != null && !HadoopConstants.SPARK_MODE_YARN_CLIENT.equals(sparkParam.getValue())) {
-                                sparkParam.setValue(HadoopConstants.SPARK_MODE_YARN_CLIENT);
+                            if (sparkParam != null && !HadoopConstants.SPARK_MODE_YARN_CLUSTER.equals(sparkParam.getValue())) {
+                                sparkParam.setValue(HadoopConstants.SPARK_MODE_YARN_CLUSTER);
                             }
                         }
                     }

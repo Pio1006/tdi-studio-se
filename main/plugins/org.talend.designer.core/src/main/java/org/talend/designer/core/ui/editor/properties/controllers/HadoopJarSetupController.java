@@ -164,13 +164,8 @@ public class HadoopJarSetupController extends AbstractElementPropertySectionCont
                     }
                 };
 
-                IElementParameter sparkLocalParam = elem.getElementParameter(HadoopConstants.SPARK_LOCAL_MODE);
                 IElementParameter sparkParam = elem.getElementParameter(HadoopConstants.SPARK_MODE);
                 boolean isSparkLocalMode = false;
-
-                if (sparkLocalParam != null) {
-                    isSparkLocalMode = (Boolean) sparkLocalParam.getValue();
-                }
 
                 if (sparkParam != null) {
                     String sparkMode = null;

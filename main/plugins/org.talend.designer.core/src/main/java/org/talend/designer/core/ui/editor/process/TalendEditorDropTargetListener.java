@@ -712,11 +712,7 @@ public class TalendEditorDropTargetListener extends TemplateTransferDropTargetLi
                 // Update spark mode to YARN_CLIENT if repository
                 if (ComponentCategory.CATEGORY_4_SPARK.getName().equals(process.getComponentsType())
                         || ComponentCategory.CATEGORY_4_SPARKSTREAMING.getName().equals(process.getComponentsType())) {
-                    IElementParameter sparkLocalParam = process.getElementParameter(HadoopConstants.SPARK_LOCAL_MODE);
                     IElementParameter sparkParam = process.getElementParameter(HadoopConstants.SPARK_MODE);
-                    if (sparkLocalParam != null && (Boolean) (sparkLocalParam.getValue())) {
-                        sparkLocalParam.setValue(false);
-                    }
 
                     if (sparkParam != null && !HadoopConstants.SPARK_MODE_YARN_CLIENT.equals(sparkParam.getValue())) {
                         sparkParam.setValue(HadoopConstants.SPARK_MODE_YARN_CLIENT);

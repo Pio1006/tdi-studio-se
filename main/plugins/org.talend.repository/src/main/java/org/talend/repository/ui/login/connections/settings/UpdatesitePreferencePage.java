@@ -13,6 +13,9 @@
 package org.talend.repository.ui.login.connections.settings;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -90,8 +93,17 @@ public class UpdatesitePreferencePage extends PreferencePage {
             UpdateSiteConfig config = p2Service.getUpdateSiteConfig(new NullProgressMonitor());
             URI release = config.getRelease(monitor);
             releaseUriText.setText(release == null ? "" : release.toString());
-            URI update = config.getUpdate(monitor);
-            updateUriText.setText(update == null ? "" : update.toString());
+            Collection<URI> updates = config.getUpdates(monitor);
+            StringBuilder updateStr = new StringBuilder();
+            if (updates != null && !updates.isEmpty()) {
+                for (String uri : updates.stream().map(uri -> uri.toString()).collect(Collectors.toList())) {
+                    if (0 < updateStr.length()) {
+                        updateStr.append(",");
+                    }
+                    updateStr.append(uri);
+                }
+            }
+            updateUriText.setText(updateStr.toString());
         } catch (Exception e) {
             ExceptionHandler.process(e);
         }
@@ -123,7 +135,16 @@ public class UpdatesitePreferencePage extends PreferencePage {
                 String release = releaseUriText.getText();
                 config.setRelease(monitor, StringUtils.isBlank(release) ? null : new URI(release.trim()));
                 String update = updateUriText.getText();
-                config.setUpdate(monitor, StringUtils.isBlank(update) ? null : new URI(update.trim()));
+                if (StringUtils.isBlank(update)) {
+                    config.setUpdates(monitor, null);
+                } else {
+                    Collection<URI> updates = new ArrayList<>();
+                    String[] splits = update.split(",");
+                    for (String split : splits) {
+                        updates.add(new URI(split.trim()));
+                    }
+                    config.setUpdates(monitor, updates);
+                }
             } catch (Exception e) {
                 ExceptionHandler.process(e);
             }

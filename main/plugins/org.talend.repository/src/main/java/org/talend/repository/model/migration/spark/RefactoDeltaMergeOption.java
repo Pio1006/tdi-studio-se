@@ -31,8 +31,6 @@ import org.talend.designer.core.model.utils.emf.talendfile.ElementValueType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
 import org.talend.designer.core.model.utils.emf.talendfile.TalendFileFactory;
-import org.talend.designer.core.model.utils.emf.talendfile.impl.ContextTypeImpl;
-import org.talend.designer.core.model.utils.emf.talendfile.impl.ElementParameterTypeImpl;
 
 /**
  *
@@ -69,11 +67,16 @@ public class RefactoDeltaMergeOption extends AbstractJobMigrationTask {
         IComponentConversion mapDeltaValue = new MapDeltaValue();
 
         try {
+            boolean modified = false;
             for (String componentName : IMPACTED_COMPONENTS) {
-                ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter(componentName),
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter(componentName),
                         java.util.Collections.singletonList(mapDeltaValue));
             }
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

@@ -56,11 +56,16 @@ public class AddUseLegacySqlForBigQueryTask extends AbstractJobMigrationTask {
 
         IComponentConversion addUseLegacySql = new AddLegacySqlCheckbox();
         try {
+            boolean modified = false;
             for(String componentName : componentNames){
-                ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter(componentName),
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter(componentName),
                         Arrays.<IComponentConversion> asList(addUseLegacySql));
             }
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             return ExecutionResult.FAILURE;
         }

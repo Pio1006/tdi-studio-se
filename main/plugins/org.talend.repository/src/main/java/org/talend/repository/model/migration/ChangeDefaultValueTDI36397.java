@@ -49,10 +49,10 @@ public class ChangeDefaultValueTDI36397 extends AbstractJobMigrationTask {
         String[] componentsName = new String[] { "tVerticaOutput" };
 
         try {
-
+            boolean modified = false;
             for (int i = 0; i < componentsName.length; i++) {
                 IComponentFilter filter = new NameComponentFilter(componentsName[i]);
-                ModifyComponentsAction.searchAndModify(item, processType, filter,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
                         Arrays.<IComponentConversion> asList(new IComponentConversion() {
 
                             public void transform(NodeType node) {
@@ -65,7 +65,11 @@ public class ChangeDefaultValueTDI36397 extends AbstractJobMigrationTask {
                         }));
             }
 
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

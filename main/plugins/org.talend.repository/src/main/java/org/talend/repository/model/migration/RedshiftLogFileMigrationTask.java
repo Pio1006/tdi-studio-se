@@ -41,11 +41,11 @@ public class RedshiftLogFileMigrationTask extends AbstractJobMigrationTask {
             return ExecutionResult.NOTHING_TO_DO;
         }
         String[] comps = { "tRedshiftConnection", "tRedshiftInput" };
-
+        boolean modified = false;
         for (String component : comps) {
             IComponentFilter filter = new NameComponentFilter(component); // $NON-NLS-1$
             try {
-                ModifyComponentsAction.searchAndModify(item, processType, filter,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
                         Arrays.<IComponentConversion>asList(new IComponentConversion() {
 
                             @Override
@@ -65,7 +65,11 @@ public class RedshiftLogFileMigrationTask extends AbstractJobMigrationTask {
             }
         }
 
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 
     }
 

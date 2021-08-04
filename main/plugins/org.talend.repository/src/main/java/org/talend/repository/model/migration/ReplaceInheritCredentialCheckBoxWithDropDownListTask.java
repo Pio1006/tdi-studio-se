@@ -73,10 +73,15 @@ public class ReplaceInheritCredentialCheckBoxWithDropDownListTask extends Abstra
         );
 
         try {
+            boolean modified = false;
             for (NameComponentFilter filter : componentNames) {
-                ModifyComponentsAction.searchAndModify(item, processType, filter, conversions);
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter, conversions);
             }
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

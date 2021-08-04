@@ -1,5 +1,10 @@
 package org.talend.repository.model.migration;
 
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.core.language.ECodeLanguage;
@@ -12,11 +17,6 @@ import org.talend.core.model.migration.AbstractJobMigrationTask;
 import org.talend.core.model.properties.Item;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 public class SetForceCopyFortFileCopy extends AbstractJobMigrationTask {
 
@@ -44,11 +44,12 @@ public class SetForceCopyFortFileCopy extends AbstractJobMigrationTask {
 
         };
 
+        boolean modified = false;
         for (String name : compNames) {
             IComponentFilter filter = new NameComponentFilter(name);
 
             try {
-                ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
                         .<IComponentConversion> asList(action));
             } catch (PersistenceException e) {
                 ExceptionHandler.process(e);
@@ -56,7 +57,11 @@ public class SetForceCopyFortFileCopy extends AbstractJobMigrationTask {
             }
         }
 
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
     }
 
     @Override

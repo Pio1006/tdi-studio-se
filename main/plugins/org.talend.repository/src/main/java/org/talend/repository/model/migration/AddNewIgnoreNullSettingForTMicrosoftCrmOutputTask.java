@@ -35,7 +35,7 @@ public class AddNewIgnoreNullSettingForTMicrosoftCrmOutputTask extends AbstractJ
         try {
 
             IComponentFilter filter = new NameComponentFilter(componentName);
-            ModifyComponentsAction.searchAndModify(item, processType, filter,
+            boolean modified = ModifyComponentsAction.searchAndModify(item, processType, filter,
                     Arrays.<IComponentConversion> asList(new IComponentConversion() {
 
                         @Override
@@ -50,7 +50,11 @@ public class AddNewIgnoreNullSettingForTMicrosoftCrmOutputTask extends AbstractJ
 
                     }));
 
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

@@ -51,10 +51,11 @@ public class AddApiModeToMarketoComponentsMigrationTask extends AbstractJobMigra
             return ExecutionResult.NOTHING_TO_DO;
         }
         String[] mktoComponents = new String[] { "tMarketoInput", "tMarketoOutput", "tMarketoListOperation" };
+        boolean modified = false;
         try {
             for (String mktoComp : mktoComponents) {
                 IComponentFilter filter = new NameComponentFilter(mktoComp);
-                ModifyComponentsAction.searchAndModify(item, processType, filter,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
                         Arrays.<IComponentConversion> asList(new IComponentConversion() {
 
                             @Override
@@ -70,7 +71,11 @@ public class AddApiModeToMarketoComponentsMigrationTask extends AbstractJobMigra
                             }
                         }));
             }
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

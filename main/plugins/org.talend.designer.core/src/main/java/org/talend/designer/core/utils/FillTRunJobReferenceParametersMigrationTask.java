@@ -68,7 +68,7 @@ public class FillTRunJobReferenceParametersMigrationTask extends AbstractItemMig
 
         IComponentFilter filter = new NameComponentFilter("tRunJob"); //$NON-NLS-1$
         try {
-            ModifyComponentsAction.searchAndModify(item, pt, filter,
+            boolean modified = ModifyComponentsAction.searchAndModify(item, pt, filter,
                     Arrays.<IComponentConversion> asList(new IComponentConversion() {
 
                         @Override
@@ -86,12 +86,15 @@ public class FillTRunJobReferenceParametersMigrationTask extends AbstractItemMig
                         }
 
                     }));
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            }
         } catch (PersistenceException e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;
         }
 
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        return ExecutionResult.NOTHING_TO_DO;
     }
 
     private static String getIdFormLabel(final String label) {

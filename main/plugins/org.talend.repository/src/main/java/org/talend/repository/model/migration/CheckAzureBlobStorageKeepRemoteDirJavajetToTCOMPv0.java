@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.talend.core.model.migration.AbstractJobMigrationTask;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.commons.ui.runtime.exception.ExceptionHandler;
 import org.talend.core.language.ECodeLanguage;
@@ -29,8 +28,9 @@ public class CheckAzureBlobStorageKeepRemoteDirJavajetToTCOMPv0 extends Abstract
         }
 
         IComponentFilter filter = new NameComponentFilter("tAzureStorageGet"); //$NON-NLS-1$
+        boolean modified = false;
         try {
-            ModifyComponentsAction.searchAndModify(item, processType, filter,
+            modified = ModifyComponentsAction.searchAndModify(item, processType, filter,
                     Arrays.<IComponentConversion>asList(new IComponentConversion() {
 
                         public void transform(NodeType node) {
@@ -48,7 +48,11 @@ public class CheckAzureBlobStorageKeepRemoteDirJavajetToTCOMPv0 extends Abstract
             return ExecutionResult.FAILURE;
         }
 
-        return ExecutionResult.SUCCESS_WITH_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_WITH_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 
     }
 

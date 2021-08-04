@@ -44,11 +44,12 @@ public class UncheckBson2JsonTask extends AbstractJobMigrationTask {
 
         };
 
+        boolean modified = false;
         for (String name : compNames) {
             IComponentFilter filter = new NameComponentFilter(name);
 
             try {
-                ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
                         .<IComponentConversion> asList(action));
             } catch (PersistenceException e) {
                 ExceptionHandler.process(e);
@@ -56,7 +57,11 @@ public class UncheckBson2JsonTask extends AbstractJobMigrationTask {
             }
         }
 
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
     }
 
     @Override

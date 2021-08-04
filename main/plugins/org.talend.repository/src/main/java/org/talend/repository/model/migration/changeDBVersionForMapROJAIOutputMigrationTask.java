@@ -16,7 +16,6 @@ import java.util.GregorianCalendar;
 
 import org.talend.commons.exception.PersistenceException;
 import org.talend.commons.ui.runtime.exception.ExceptionHandler;
-import org.talend.core.language.ECodeLanguage;
 import org.talend.core.model.components.ComponentUtilities;
 import org.talend.core.model.components.ModifyComponentsAction;
 import org.talend.core.model.components.conversions.IComponentConversion;
@@ -27,7 +26,6 @@ import org.talend.core.model.properties.Item;
 import org.talend.designer.core.model.utils.emf.talendfile.ElementParameterType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
-import org.talend.migration.IMigrationTask.ExecutionResult;
 
 public class changeDBVersionForMapROJAIOutputMigrationTask extends AbstractJobMigrationTask {
 
@@ -65,11 +63,12 @@ public class changeDBVersionForMapROJAIOutputMigrationTask extends AbstractJobMi
 
     	};
 
+        boolean modified = false;
     	for (String name : compNames) {
             IComponentFilter filter = new NameComponentFilter(name);
 
             try {
-                ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
                         .<IComponentConversion> asList(changeDBNVersion));
             } catch (PersistenceException e) {
                 // TODO Auto-generated catch block
@@ -78,7 +77,11 @@ public class changeDBVersionForMapROJAIOutputMigrationTask extends AbstractJobMi
             }
         }
 
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 
     }
 }

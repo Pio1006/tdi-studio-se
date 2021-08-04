@@ -38,7 +38,8 @@ public class GenerateJobPomMigrationTask extends AbstractItemMigrationTask {
         // only execute the migration task during logon, disable it for the import item (check of log finished)
         if (!ProxyRepositoryFactory.getInstance().isFullLogonFinished()) {
             CorePlugin.getDefault().getRunProcessService().generatePom(item);
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            // this migration task would be removed later
+            return ExecutionResult.NOTHING_TO_DO;
         }
         return ExecutionResult.NOTHING_TO_DO;
     }

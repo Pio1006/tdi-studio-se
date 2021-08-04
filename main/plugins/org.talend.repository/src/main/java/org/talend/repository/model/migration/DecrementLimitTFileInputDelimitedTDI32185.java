@@ -37,7 +37,7 @@ public class DecrementLimitTFileInputDelimitedTDI32185 extends AbstractJobMigrat
         try {
 
         	IComponentFilter filter = new NameComponentFilter("tFileInputDelimited");
-        	ModifyComponentsAction.searchAndModify(item, processType, filter,
+            boolean modified = ModifyComponentsAction.searchAndModify(item, processType, filter,
         			Arrays.<IComponentConversion> asList(new IComponentConversion() {
 
         				@Override
@@ -71,7 +71,11 @@ public class DecrementLimitTFileInputDelimitedTDI32185 extends AbstractJobMigrat
         				}
         			}));
 
-        	return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

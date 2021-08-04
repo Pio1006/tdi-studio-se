@@ -65,10 +65,11 @@ public class SubstituteRemovedMDMOperatorMigrationTask extends AbstractJobMigrat
 				}
 			}
 		};
+        boolean modified = false;
 		for (String name : componentsName) {
 			IComponentFilter filter = new NameComponentFilter(name); //$NON-NLS-1$
 			try {
-				ModifyComponentsAction
+                modified |= ModifyComponentsAction
 						.searchAndModify(
 								item,
 								processType,
@@ -79,7 +80,11 @@ public class SubstituteRemovedMDMOperatorMigrationTask extends AbstractJobMigrat
 				return ExecutionResult.FAILURE;
 			}
 		}
-		return ExecutionResult.SUCCESS_WITH_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_WITH_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 	}
 
 }

@@ -13,6 +13,7 @@ package org.talend.repository.model.migration;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
 import org.talend.commons.exception.PersistenceException;
 import org.talend.commons.ui.runtime.exception.ExceptionHandler;
 import org.talend.core.language.ECodeLanguage;
@@ -43,10 +44,11 @@ public class ChangeDBversionForSybaseIQMigrationTask extends AbstractJobMigratio
 				"tSybaseBulkExec", "tSybaseConnection", "tSybaseInput", "tSybaseOutput", "tSybaseOutputBulkExec",
 				"tSybaseRow", "tSybaseSCD", "tSybaseSCDELT", "tSybaseSP","tSybaseCDC"};
 
+        boolean modified = false;
 		for (String compName : compNmaes) {
 			IComponentFilter filter = new NameComponentFilter(compName); // $NON-NLS-1$
 			try {
-				ModifyComponentsAction.searchAndModify(item, processType, filter,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
 						Arrays.<IComponentConversion>asList(new IComponentConversion() {
 
 							public void transform(NodeType node) {
@@ -79,7 +81,11 @@ public class ChangeDBversionForSybaseIQMigrationTask extends AbstractJobMigratio
 			}
 		}
 
-		return ExecutionResult.SUCCESS_WITH_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_WITH_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 
 	}
 

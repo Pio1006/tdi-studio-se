@@ -58,8 +58,13 @@ public class AddFailOnErrorOnTFileCopyTDI38441 extends AbstractJobMigrationTask 
                 }
 
             };
-            ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays.<IComponentConversion> asList(addOption));
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            boolean modified = ModifyComponentsAction.searchAndModify(item, processType, filter,
+                    Arrays.<IComponentConversion> asList(addOption));
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

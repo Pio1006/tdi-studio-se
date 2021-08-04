@@ -1,12 +1,8 @@
 package org.talend.repository.model.migration;
 
 import java.util.Collections;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.core.language.ECodeLanguage;
@@ -19,8 +15,8 @@ import org.talend.core.model.components.filters.NameComponentFilter;
 import org.talend.core.model.migration.AbstractJobMigrationTask;
 import org.talend.core.model.properties.Item;
 import org.talend.designer.core.model.utils.emf.talendfile.ElementParameterType;
-import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
+import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
 
 /**
  * https://jira.talendforge.org/browse/TDI-46065
@@ -36,9 +32,10 @@ public class ReplaceInheritCredentialCheckBoxWithDropDownListTaskForRedshift ext
         String[] componentsName = new String[] {"tRedshiftBulkExec", "tRedshiftOutputBulk", "tRedshiftOutputBulkExec"};
 
         try {
+            boolean modified = false;
             for (int i = 0; i < componentsName.length; i++) {
                 IComponentFilter filter = new NameComponentFilter(componentsName[i]);
-                ModifyComponentsAction.searchAndModify(item, processType, filter,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
                         Collections.singletonList(new IComponentConversion() {
 
                             public void transform(NodeType node) {
@@ -54,7 +51,7 @@ public class ReplaceInheritCredentialCheckBoxWithDropDownListTaskForRedshift ext
                             }
                         }));
                 if(componentsName[i].equals("tRedshiftBulkExec")) {
-                    ModifyComponentsAction.searchAndModify(item, processType, filter,
+                    modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
                         Collections.singletonList(new IComponentConversion() {
 
                             public void transform(NodeType node) {
@@ -62,11 +59,15 @@ public class ReplaceInheritCredentialCheckBoxWithDropDownListTaskForRedshift ext
                             }
                     }));
                 }
-                ModifyComponentsAction.searchAndModify(item, processType, filter, 
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
                     Collections.singletonList(new RemovePropertyComponentConversion("INHERIT_CREDENTIALS")));
             }
 
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

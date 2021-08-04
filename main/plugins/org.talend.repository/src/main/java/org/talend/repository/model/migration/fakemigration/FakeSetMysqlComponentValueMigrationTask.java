@@ -10,12 +10,13 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.repository.model.migration;
+package org.talend.repository.model.migration.fakemigration;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.apache.commons.lang.StringUtils;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.commons.ui.runtime.exception.ExceptionHandler;
 import org.talend.core.language.ECodeLanguage;
@@ -26,14 +27,23 @@ import org.talend.core.model.components.filters.IComponentFilter;
 import org.talend.core.model.components.filters.NameComponentFilter;
 import org.talend.core.model.migration.AbstractJobMigrationTask;
 import org.talend.core.model.properties.Item;
+import org.talend.core.utils.TalendQuoteUtils;
 import org.talend.designer.core.model.utils.emf.talendfile.ElementParameterType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
+import org.talend.migration.IProjectMigrationTask;
+import org.talend.migration.MigrationReportRecorder;
 
 /**
- * DOC Administrator class global comment. Detailled comment
+ * DOC jding  class global comment. Detailled comment
  */
-public class TExtractJSONSplitListMigrationTask extends AbstractJobMigrationTask {
+public class FakeSetMysqlComponentValueMigrationTask extends AbstractJobMigrationTask {
+
+    @Override
+    public Date getOrder() {
+        GregorianCalendar gc = new GregorianCalendar(2021, 07, 29, 15, 0, 0);
+        return gc.getTime();
+    }
 
     @Override
     public ExecutionResult execute(Item item) {
@@ -41,21 +51,26 @@ public class TExtractJSONSplitListMigrationTask extends AbstractJobMigrationTask
         if (getProject().getLanguage() != ECodeLanguage.JAVA || processType == null) {
             return ExecutionResult.NOTHING_TO_DO;
         }
+
         boolean modified = false;
-        IComponentFilter filter = new NameComponentFilter("tExtractJSONFields");
+        IProjectMigrationTask task = this;
+        IComponentFilter filter = new NameComponentFilter("tMysqlInput"); //$NON-NLS-1$
         try {
-            modified = ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
-                    .<IComponentConversion> asList(new IComponentConversion() {
+            modified = ModifyComponentsAction.searchAndModify(item, processType, filter,
+                    Arrays.<IComponentConversion> asList(new IComponentConversion() {
 
                         public void transform(NodeType node) {
-                            if (ComponentUtilities.getNodeProperty(node, "SPLIT_LIST") == null) {//$NON-NLS-1$
-                                ComponentUtilities.addNodeProperty(node, "SPLIT_LIST", "CHECK");//$NON-NLS-1$
-                                ElementParameterType splitList = ComponentUtilities.getNodeProperty(node,
-                                        "SPLIT_LIST"); //$NON-NLS-1$
-                                splitList.setValue("false");
+                            ElementParameterType parameter = ComponentUtilities.getNodeProperty(node,
+                                    "HOST");
+                            String value = TalendQuoteUtils.removeQuotes(parameter.getValue());
+                            if (StringUtils.isBlank(value)) {
+                                parameter.setValue("localhost");
+                                generateReportRecord(new MigrationReportRecorder(task, MigrationReportRecorder.MigrationOperationType.ADD, item, node, "HOST", null, null));
+                                ElementParameterType passparameter = ComponentUtilities.getNodeProperty(node, "PASS");
+                                passparameter.setValue("");
+                                generateReportRecord(new MigrationReportRecorder(task,
+                                        MigrationReportRecorder.MigrationOperationType.DELETE, item, node, "PASS", null, null));
                             }
-
-
                         }
                     }));
         } catch (PersistenceException e) {
@@ -63,16 +78,7 @@ public class TExtractJSONSplitListMigrationTask extends AbstractJobMigrationTask
             return ExecutionResult.FAILURE;
         }
 
-        if (modified) {
-            return ExecutionResult.SUCCESS_NO_ALERT;
-        } else {
-            return ExecutionResult.NOTHING_TO_DO;
-        }
-
+        return modified ? ExecutionResult.SUCCESS_WITH_ALERT : ExecutionResult.NOTHING_TO_DO;
     }
 
-    public Date getOrder() {
-        GregorianCalendar gc = new GregorianCalendar(2018, 2, 1, 11, 0, 0);
-        return gc.getTime();
-    }
 }

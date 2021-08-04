@@ -175,10 +175,11 @@ public class MigrateTDataMaskingGuiTDQ16376 extends AbstractJobMigrationTask {
 
         IComponentConversion useOracle11InsteadOfRemovedVersion = new MigrateDataMaskingParameters();
 
+        boolean modified = false;
         try {
             for (String componentName : componentsNameToAffect) {
                 IComponentFilter componentFilter = new NameComponentFilter(componentName);
-                ModifyComponentsAction.searchAndModify(item, processType, componentFilter,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, componentFilter,
                         Arrays.<IComponentConversion> asList(useOracle11InsteadOfRemovedVersion));
             }
 
@@ -187,7 +188,11 @@ public class MigrateTDataMaskingGuiTDQ16376 extends AbstractJobMigrationTask {
             return ExecutionResult.FAILURE;
         }
 
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
     }
 
     private class MigrateDataMaskingParameters implements IComponentConversion {

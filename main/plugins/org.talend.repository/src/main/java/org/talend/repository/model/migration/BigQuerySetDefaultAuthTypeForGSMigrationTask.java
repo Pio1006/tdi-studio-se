@@ -12,22 +12,22 @@
 //============================================================================
 package org.talend.repository.model.migration;
 
-        import java.util.Date;
-        import java.util.GregorianCalendar;
         import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
-        import org.talend.commons.exception.ExceptionHandler;
-        import org.talend.commons.exception.PersistenceException;
-        import org.talend.core.language.ECodeLanguage;
-        import org.talend.core.model.components.ComponentUtilities;
-        import org.talend.core.model.components.ModifyComponentsAction;
-        import org.talend.core.model.components.conversions.IComponentConversion;
-        import org.talend.core.model.components.filters.IComponentFilter;
-        import org.talend.core.model.components.filters.NameComponentFilter;
-        import org.talend.core.model.migration.AbstractJobMigrationTask;
-        import org.talend.core.model.properties.Item;
-        import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
-        import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
+import org.talend.commons.exception.ExceptionHandler;
+import org.talend.commons.exception.PersistenceException;
+import org.talend.core.language.ECodeLanguage;
+import org.talend.core.model.components.ComponentUtilities;
+import org.talend.core.model.components.ModifyComponentsAction;
+import org.talend.core.model.components.conversions.IComponentConversion;
+import org.talend.core.model.components.filters.IComponentFilter;
+import org.talend.core.model.components.filters.NameComponentFilter;
+import org.talend.core.model.migration.AbstractJobMigrationTask;
+import org.talend.core.model.properties.Item;
+import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
+import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
 
 public class BigQuerySetDefaultAuthTypeForGSMigrationTask extends AbstractJobMigrationTask{
 
@@ -62,15 +62,21 @@ public class BigQuerySetDefaultAuthTypeForGSMigrationTask extends AbstractJobMig
             }
         };
 
+        boolean modified = false;
         for (String componentName : componentsNameToAffect) {
             IComponentFilter componentFilter = new NameComponentFilter(componentName);
             try {
-                ModifyComponentsAction.searchAndModify(item, processType, componentFilter, Collections.singletonList(defaultAuthType));
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, componentFilter,
+                        Collections.singletonList(defaultAuthType));
             } catch (PersistenceException e) {
                 ExceptionHandler.process(e);
                 return ExecutionResult.FAILURE;
             }
         }
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
     }
 }

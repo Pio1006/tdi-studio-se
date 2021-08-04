@@ -27,7 +27,6 @@ import org.talend.core.model.properties.Item;
 import org.talend.core.model.repository.ERepositoryObjectType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
-import org.talend.designer.core.model.utils.emf.talendfile.impl.ContextTypeImpl;
 import org.talend.designer.core.model.utils.emf.talendfile.impl.ElementParameterTypeImpl;
 
 /**
@@ -81,11 +80,16 @@ public class UpdateSeparatorAndEscapeForDatasetAPI extends AbstractJobMigrationT
         IComponentConversion adaptSeparatorAndEscape = new AdaptSeparatorAndEscape();
 
         try {
+            boolean modified = false;
             for (String componentName : IMPACTED_COMPONENTS) {
-                ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter(componentName),
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter(componentName),
                         java.util.Collections.singletonList(adaptSeparatorAndEscape));
             }
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

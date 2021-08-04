@@ -45,56 +45,61 @@ public class ChangeDQComponentsLicenseKeyFieldTask extends AbstractJobMigrationT
     public ExecutionResult execute(Item item) {
         ProcessType processType = getProcessType(item);
         try {
+            boolean modified = false;
             // tAddressRowCloud
             IComponentFilter filter_tAddressRowCloud = new NameComponentFilter("tAddressRowCloud");
             IComponentConversion check_tAddressRowCloud = new Check_tAddressRowCloud();
-            ModifyComponentsAction
+            modified |= ModifyComponentsAction
                     .searchAndModify(item, processType, filter_tAddressRowCloud,
                             Arrays.<IComponentConversion> asList(check_tAddressRowCloud));
 
             // tBatchAddressRowCloud
             IComponentFilter filter_tBatchAddressRowCloud = new NameComponentFilter("tBatchAddressRowCloud");
             IComponentConversion check_tBatchAddressRowCloud = new Check_tBatchAddressRowCloud();
-            ModifyComponentsAction
+            modified |= ModifyComponentsAction
                     .searchAndModify(item, processType, filter_tBatchAddressRowCloud,
                             Arrays.<IComponentConversion> asList(check_tBatchAddressRowCloud));
 
             // tMelissaDataAddress
             IComponentFilter filter_tMelissaDataAddress = new NameComponentFilter("tMelissaDataAddress");
             IComponentConversion check_tMelissaDataAddress = new Check_tMelissaDataAddress();
-            ModifyComponentsAction
+            modified |= ModifyComponentsAction
                     .searchAndModify(item, processType, filter_tMelissaDataAddress,
                             Arrays.<IComponentConversion> asList(check_tMelissaDataAddress));
 
             // tGoogleAddressRow
             IComponentFilter filter_tGoogleAddressRow = new NameComponentFilter("tGoogleAddressRow");
             IComponentConversion check_tGoogleAddressRow = new Check_tGoogleAddressRow();
-            ModifyComponentsAction
+            modified |= ModifyComponentsAction
                     .searchAndModify(item, processType, filter_tGoogleAddressRow,
                             Arrays.<IComponentConversion> asList(check_tGoogleAddressRow));
 
             // tGoogleGeocoder
             IComponentFilter filter_tGoogleGeocoder = new NameComponentFilter("tGoogleGeocoder");
             IComponentConversion check_tGoogleGeocoder = new Check_tGoogleGeocoder();
-            ModifyComponentsAction
+            modified |= ModifyComponentsAction
                     .searchAndModify(item, processType, filter_tGoogleGeocoder,
                             Arrays.<IComponentConversion> asList(check_tGoogleGeocoder));
 
             // tGoogleMapLookup
             IComponentFilter filter_tGoogleMapLookup = new NameComponentFilter("tGoogleMapLookup");
             IComponentConversion check_tGoogleMapLookup = new Check_tGoogleMapLookup();
-            ModifyComponentsAction
+            modified |= ModifyComponentsAction
                     .searchAndModify(item, processType, filter_tGoogleMapLookup,
                             Arrays.<IComponentConversion> asList(check_tGoogleMapLookup));
 
             // tPersonator
             IComponentFilter filter_tPersonator = new NameComponentFilter("tPersonator");
             IComponentConversion check_tPersonator = new Check_tPersonator();
-            ModifyComponentsAction
+            modified |= ModifyComponentsAction
                     .searchAndModify(item, processType, filter_tPersonator,
                             Arrays.<IComponentConversion> asList(check_tPersonator));
 
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

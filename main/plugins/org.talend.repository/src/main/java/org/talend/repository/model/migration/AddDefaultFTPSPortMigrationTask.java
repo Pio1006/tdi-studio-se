@@ -16,7 +16,6 @@ import org.talend.core.model.properties.Item;
 import org.talend.designer.core.model.utils.emf.talendfile.ElementParameterType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
-import org.talend.migration.IMigrationTask.ExecutionResult;
 
 public class AddDefaultFTPSPortMigrationTask extends AbstractJobMigrationTask {
 
@@ -71,13 +70,18 @@ public class AddDefaultFTPSPortMigrationTask extends AbstractJobMigrationTask {
 
             };
 
-            ModifyComponentsAction.searchAndModify(item, processType, connectionFilter,
+            boolean modified = false;
+            modified |= ModifyComponentsAction.searchAndModify(item, processType, connectionFilter,
                     Arrays.<IComponentConversion> asList(addOptionConversion));
-            ModifyComponentsAction.searchAndModify(item, processType, getFilter,
+            modified |= ModifyComponentsAction.searchAndModify(item, processType, getFilter,
                     Arrays.<IComponentConversion> asList(addOptionConversion));
-            ModifyComponentsAction.searchAndModify(item, processType, putFilter,
+            modified |= ModifyComponentsAction.searchAndModify(item, processType, putFilter,
                     Arrays.<IComponentConversion> asList(addOptionConversion));
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

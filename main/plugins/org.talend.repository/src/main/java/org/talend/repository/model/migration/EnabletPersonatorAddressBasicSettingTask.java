@@ -32,11 +32,15 @@ public class EnabletPersonatorAddressBasicSettingTask extends AbstractJobMigrati
             // tPersonator
             IComponentFilter filter_tPersonator = new NameComponentFilter("tPersonator");
             IComponentConversion update_tPersonator = new Update_tPersonator();
-            ModifyComponentsAction
+            boolean modified = ModifyComponentsAction
                     .searchAndModify(item, processType, filter_tPersonator,
                             Arrays.<IComponentConversion> asList(update_tPersonator));
 
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

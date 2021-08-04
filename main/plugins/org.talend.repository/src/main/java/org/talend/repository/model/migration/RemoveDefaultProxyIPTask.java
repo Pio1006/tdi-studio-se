@@ -41,11 +41,12 @@ public class RemoveDefaultProxyIPTask extends AbstractJobMigrationTask {
         if (getProject().getLanguage() != ECodeLanguage.JAVA || processType == null) {
             return ExecutionResult.NOTHING_TO_DO;
         }
+        boolean modified = false;
         String[] componentsName = new String[] { "tFTPConnection", "tFTPDelete", "tFTPFileExist", "tFTPFileList", "tFTPFileProperties", "tFTPGet", "tFTPPut", "tFTPRename", "tFTPTruncate", "tFileFetch", "tRSSInput", "tSOAP", "tSetProxy", "tWebService", "tWebServiceInput" }; //$NON-NLS-1$ //$NON-NLS-2$
         for (String name : componentsName) {
             IComponentFilter filter = new NameComponentFilter(name);
             try {
-                ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
                         .<IComponentConversion> asList(new IComponentConversion() {
 
                             public void transform(NodeType node) {
@@ -76,7 +77,11 @@ public class RemoveDefaultProxyIPTask extends AbstractJobMigrationTask {
             }
         }
 
-        return ExecutionResult.SUCCESS_WITH_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_WITH_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 
     }
 

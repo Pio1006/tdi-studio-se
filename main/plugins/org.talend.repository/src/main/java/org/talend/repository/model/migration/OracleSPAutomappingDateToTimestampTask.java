@@ -1,5 +1,16 @@
 package org.talend.repository.model.migration;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.eclipse.emf.common.util.EList;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
@@ -10,16 +21,15 @@ import org.talend.core.model.components.filters.IComponentFilter;
 import org.talend.core.model.components.filters.NameComponentFilter;
 import org.talend.core.model.migration.AbstractJobMigrationTask;
 import org.talend.core.model.properties.Item;
-import org.talend.designer.core.model.utils.emf.talendfile.*;
+import org.talend.designer.core.model.utils.emf.talendfile.ColumnType;
+import org.talend.designer.core.model.utils.emf.talendfile.ElementParameterType;
+import org.talend.designer.core.model.utils.emf.talendfile.ElementValueType;
+import org.talend.designer.core.model.utils.emf.talendfile.MetadataType;
+import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
+import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
 import org.talend.repository.model.IProxyRepositoryFactory;
 import org.talend.repository.model.IRepositoryService;
 import org.talend.repository.model.migration.utils.EmfUtils;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class OracleSPAutomappingDateToTimestampTask extends AbstractJobMigrationTask {
 
@@ -35,8 +45,13 @@ public class OracleSPAutomappingDateToTimestampTask extends AbstractJobMigration
             if (processType == null) {
                 return ExecutionResult.NOTHING_TO_DO;
             }
-            ModifyComponentsAction.searchAndModify(item, processType, OracleSPAutomappingDateToTimestampTask.filter, OracleSPAutomappingDateToTimestampTask.actions);
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            boolean modified = ModifyComponentsAction.searchAndModify(item, processType,
+                    OracleSPAutomappingDateToTimestampTask.filter, OracleSPAutomappingDateToTimestampTask.actions);
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

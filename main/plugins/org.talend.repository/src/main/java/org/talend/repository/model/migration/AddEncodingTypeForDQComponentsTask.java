@@ -77,9 +77,13 @@ public class AddEncodingTypeForDQComponentsTask extends AbstractJobMigrationTask
 
             };
             IComponentConversion checkGIDType = new CheckGIDType();
-            ModifyComponentsAction
+            boolean modified = ModifyComponentsAction
                     .searchAndModify(item, processType, filter, Arrays.<IComponentConversion> asList(checkGIDType));
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

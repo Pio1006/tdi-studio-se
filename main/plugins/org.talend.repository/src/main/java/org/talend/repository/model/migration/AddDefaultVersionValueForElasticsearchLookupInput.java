@@ -76,11 +76,12 @@ public class AddDefaultVersionValueForElasticsearchLookupInput extends
 
 		};
 
+        boolean modified = false;
 		for (String name : compNames) {
 			IComponentFilter filter = new NameComponentFilter(name);
 
 			try {
-				ModifyComponentsAction.searchAndModify(item, processType,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType,
 						filter,
 						Arrays.<IComponentConversion> asList(conversion));
 			} catch (PersistenceException e) {
@@ -90,7 +91,11 @@ public class AddDefaultVersionValueForElasticsearchLookupInput extends
 			}
 		}
 
-		return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 	}
 
 }

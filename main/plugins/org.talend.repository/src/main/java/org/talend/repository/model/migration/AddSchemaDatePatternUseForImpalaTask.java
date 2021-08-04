@@ -18,24 +18,16 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.eclipse.emf.common.util.EList;
-import org.talend.commons.exception.PersistenceException;
-import org.talend.commons.ui.runtime.exception.ExceptionHandler;
-import org.talend.core.model.components.ComponentUtilities;
 import org.talend.core.model.components.ModifyComponentsAction;
 import org.talend.core.model.components.conversions.IComponentConversion;
 import org.talend.core.model.components.filters.NameComponentFilter;
 import org.talend.core.model.migration.AbstractJobMigrationTask;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.repository.ERepositoryObjectType;
-import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.designer.core.model.utils.emf.talendfile.ColumnType;
-import org.talend.designer.core.model.utils.emf.talendfile.ElementParameterType;
 import org.talend.designer.core.model.utils.emf.talendfile.MetadataType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
-import org.talend.designer.core.model.utils.emf.talendfile.ParametersType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
-import org.talend.migration.IMigrationTask.ExecutionResult;
 
 /**
  *
@@ -63,7 +55,8 @@ public class AddSchemaDatePatternUseForImpalaTask extends AbstractJobMigrationTa
         String componentName = "tImpalaOutput";
 
         try {
-            ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter(componentName), Arrays
+            boolean modified = ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter(componentName),
+                    Arrays
                     .<IComponentConversion> asList(new IComponentConversion() {
 
                         public void transform(NodeType node) {
@@ -80,7 +73,11 @@ public class AddSchemaDatePatternUseForImpalaTask extends AbstractJobMigrationTa
                         }
 
                     }));
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             return ExecutionResult.FAILURE;
         }

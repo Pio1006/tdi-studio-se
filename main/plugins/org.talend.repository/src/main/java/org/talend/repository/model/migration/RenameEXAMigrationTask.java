@@ -48,6 +48,7 @@ public class RenameEXAMigrationTask extends AbstractJobMigrationTask {
             return ExecutionResult.NOTHING_TO_DO;
         }
         try {
+            boolean modified = false;
             for (int i = 0; i < source.length; i++) {
                 final int j = i;
                 IComponentFilter filter = new NameComponentFilter(source[i]);
@@ -121,10 +122,14 @@ public class RenameEXAMigrationTask extends AbstractJobMigrationTask {
 
                     }
                 };
-                ModifyComponentsAction.searchAndModify(item, processType, filter,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
                         Arrays.<IComponentConversion> asList(renameConversion, changeNodeNameConversion));
             }
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

@@ -81,15 +81,20 @@ public class SetGlobalTimestampOptionForPreviousVersions extends AbstractJobMigr
         IComponentConversion adaptSchemaForDateType = new AdaptSchemaForDateType();
 
         try {
+            boolean modified = false;
         	if (isAComponentUsingDate(processType)) {
         		for (String componentName : IMPACTED_COMPONENTS) {
-                    ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter(componentName),
+                    modified |= ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter(componentName),
                             java.util.Collections.singletonList(adaptSchemaForDateType));
                 }
         	} else {
         		setGlobalOption(processType, item);
         	}
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

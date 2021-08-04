@@ -89,31 +89,36 @@ public class AddRAWFlowMaskingComponents extends AbstractJobMigrationTask {
             IComponentFilter filter = new NameComponentFilter("tPatternMasking"); //$NON-NLS-1$
             IComponentConversion unCheckRaw = new UnCheckRAWFlow();
             IComponentConversion changeMetadataName = new ChangeMetadataName();
-            ModifyComponentsAction
+            boolean modified = false;
+            modified |= ModifyComponentsAction
                     .searchAndModify(item, processType, filter,
                             Arrays.<IComponentConversion> asList(unCheckRaw, changeMetadataName));
 
             filter = new NameComponentFilter("tPatternUnmasking"); //$NON-NLS-1$
             unCheckRaw = new UnCheckRAWFlow();
             changeMetadataName = new ChangeMetadataName();
-            ModifyComponentsAction
+            modified |= ModifyComponentsAction
                     .searchAndModify(item, processType, filter,
                             Arrays.<IComponentConversion> asList(unCheckRaw, changeMetadataName));
 
             filter = new NameComponentFilter("tDataMasking"); //$NON-NLS-1$
             unCheckRaw = new UnCheckRAWFlow();
             changeMetadataName = new ChangeMetadataName();
-            ModifyComponentsAction
+            modified |= ModifyComponentsAction
                     .searchAndModify(item, processType, filter,
                             Arrays.<IComponentConversion> asList(unCheckRaw, changeMetadataName));
 
             filter = new NameComponentFilter("tDataUnmasking"); //$NON-NLS-1$
             unCheckRaw = new UnCheckRAWFlow();
             changeMetadataName = new ChangeMetadataName();
-            ModifyComponentsAction
+            modified |= ModifyComponentsAction
                     .searchAndModify(item, processType, filter,
                             Arrays.<IComponentConversion> asList(unCheckRaw, changeMetadataName));
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

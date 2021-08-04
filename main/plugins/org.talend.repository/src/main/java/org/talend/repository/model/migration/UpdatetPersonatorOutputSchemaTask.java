@@ -47,11 +47,15 @@ public class UpdatetPersonatorOutputSchemaTask extends AbstractJobMigrationTask 
             // tPersonator
             IComponentFilter filter_tAddressRowCloud = new NameComponentFilter("tPersonator");
             IComponentConversion update_tPersonator = new Update_tPersonator();
-            ModifyComponentsAction
+            boolean modified = ModifyComponentsAction
                     .searchAndModify(item, processType, filter_tAddressRowCloud,
                             Arrays.<IComponentConversion> asList(update_tPersonator));
 
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

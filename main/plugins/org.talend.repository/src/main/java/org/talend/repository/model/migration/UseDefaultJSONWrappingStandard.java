@@ -58,8 +58,13 @@ public class UseDefaultJSONWrappingStandard extends AbstractJobMigrationTask {
         };
         IComponentFilter filter = new NameComponentFilter("tWriteJSONField");
         try {
-            ModifyComponentsAction.searchAndModify(item, processType, filter, Collections.singletonList(setOldStandardConversion));
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            boolean modified = ModifyComponentsAction.searchAndModify(item, processType, filter,
+                    Collections.singletonList(setOldStandardConversion));
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (PersistenceException e) {
             return ExecutionResult.FAILURE;
         }

@@ -4084,5 +4084,26 @@
             name="Update site">
       </page>
    </extension>
+   <extension
+         point="org.talend.core.migrationTask">
+      <projecttask
+            beforeLogon="false"
+            breaks="7.3.0"
+            class="org.talend.repository.model.migration.fakemigration.FakeSetMysqlComponentValueMigrationTask"
+            description="moke fake migration task for component"
+            id="org.talend.repository.model.migration.fakemigration.FakeSetMysqlComponentValueMigrationTask"
+            name="FakeSetMysqlComponentValueMigrationTask"
+            version="7.3.1">
+      </projecttask>
+      <projecttask
+            beforeLogon="false"
+            breaks="7.3.0"
+            class="org.talend.repository.model.migration.fakemigration.FakeSetMysqlConnectionValueMigrationTask"
+            description="mode fake migration task for item"
+            id="org.talend.repository.model.migration.fakemigration.FakeSetMysqlConnectionValueMigrationTask"
+            name="FakeSetMysqlConnectionValueMigrationTask"
+            version="7.3.1">
+      </projecttask>
+   </extension>
 
 </plugin>

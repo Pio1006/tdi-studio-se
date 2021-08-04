@@ -12,9 +12,9 @@
 //============================================================================
 package org.talend.repository.model.migration;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Collections;
 
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
@@ -70,15 +70,21 @@ public class GoogleStorageSetDefaultAuthTypeMigrationTask extends AbstractJobMig
          }
      };
 
+     boolean modified = false;
      for (String componentName : componentsNameToAffect) {
          IComponentFilter componentFilter = new NameComponentFilter(componentName);
          try {
-             ModifyComponentsAction.searchAndModify(item, processType, componentFilter, Collections.singletonList(defaultAuthType));
+             modified |= ModifyComponentsAction.searchAndModify(item, processType, componentFilter,
+                     Collections.singletonList(defaultAuthType));
          } catch (PersistenceException e) {
              ExceptionHandler.process(e);
              return ExecutionResult.FAILURE;
          }
      }
-     return ExecutionResult.SUCCESS_NO_ALERT;
+     if (modified) {
+         return ExecutionResult.SUCCESS_NO_ALERT;
+     } else {
+         return ExecutionResult.NOTHING_TO_DO;
+     }
  }
 }

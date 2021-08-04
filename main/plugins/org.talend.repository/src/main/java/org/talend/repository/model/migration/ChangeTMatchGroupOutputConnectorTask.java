@@ -63,8 +63,13 @@ public class ChangeTMatchGroupOutputConnectorTask extends AbstractJobMigrationTa
         try {
             IComponentFilter filter = new NameComponentFilter("tMatchGroup"); //$NON-NLS-1$
             IComponentConversion checkGIDType = new ChangeMetadataName();
-            ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays.<IComponentConversion> asList(checkGIDType));
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            boolean modified = ModifyComponentsAction.searchAndModify(item, processType, filter,
+                    Arrays.<IComponentConversion> asList(checkGIDType));
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

@@ -53,14 +53,19 @@ public class ChangeCDCTypeForOracle18TDI43319 extends AbstractJobMigrationTask {
                 }
             }
         };
+        boolean modified = false;
         try {
-            ModifyComponentsAction
+            modified = ModifyComponentsAction
                     .searchAndModify(item, processType, filter, Collections.singletonList(conversion));
         } catch (PersistenceException e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;
         }
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
     }
 
     // Search for connection node

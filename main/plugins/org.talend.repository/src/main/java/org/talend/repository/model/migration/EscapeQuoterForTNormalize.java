@@ -42,8 +42,9 @@ public class EscapeQuoterForTNormalize extends AbstractJobMigrationTask {
             return ExecutionResult.NOTHING_TO_DO;
         }
             IComponentFilter filter = new NameComponentFilter("tNormalize");
+            boolean modified = false;
             try {
-                ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
+                modified = ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
                         .<IComponentConversion> asList(new IComponentConversion() {
 
                             public void transform(NodeType node) {
@@ -63,7 +64,11 @@ public class EscapeQuoterForTNormalize extends AbstractJobMigrationTask {
                 return ExecutionResult.FAILURE;
             }
 
-        return ExecutionResult.SUCCESS_WITH_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_WITH_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
 
     }
 

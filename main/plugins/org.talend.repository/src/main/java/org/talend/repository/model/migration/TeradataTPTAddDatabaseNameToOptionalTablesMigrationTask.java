@@ -12,6 +12,11 @@
 //============================================================================
 package org.talend.repository.model.migration;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.core.language.ECodeLanguage;
@@ -26,11 +31,6 @@ import org.talend.designer.core.model.utils.emf.talendfile.ElementParameterType;
 import org.talend.designer.core.model.utils.emf.talendfile.ElementValueType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
 
 public class TeradataTPTAddDatabaseNameToOptionalTablesMigrationTask extends AbstractJobMigrationTask {
 
@@ -108,15 +108,21 @@ public class TeradataTPTAddDatabaseNameToOptionalTablesMigrationTask extends Abs
             }
         };
 
+        boolean modified = false;
         for (String componentName : componentsNameToAffect) {
             IComponentFilter filter = new NameComponentFilter(componentName);
             try {
-                ModifyComponentsAction.searchAndModify(item, processType, filter, Collections.singletonList(componentConversion));
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
+                        Collections.singletonList(componentConversion));
             } catch (PersistenceException e) {
                 ExceptionHandler.process(e);
                 return ExecutionResult.FAILURE;
             }
         }
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
     }
 }

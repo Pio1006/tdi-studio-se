@@ -59,22 +59,27 @@ public class UseOracle11VersionInsteadOfRemoved extends AbstractJobMigrationTask
             IComponentConversion useOracle11InsteadOfRemovedVersion = new OracleVersionConversion();
             IComponentConversion useOracle11InsteadOfRemovedVersionCreateTable = new CreateTableOracleVersionConversion();
 
+            boolean modified = false;
             try {
                 for (String componentName : componentsNameToAffect) {
                     IComponentFilter componentFilter = new NameComponentFilter(componentName);
-                    ModifyComponentsAction.searchAndModify(item, processType, componentFilter,
+                    modified |= ModifyComponentsAction.searchAndModify(item, processType, componentFilter,
                             Arrays.<IComponentConversion> asList(useOracle11InsteadOfRemovedVersion));
                 }
                 
                 
-                ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter("tCreateTable"),
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, new NameComponentFilter("tCreateTable"),
                         Arrays.<IComponentConversion> asList(useOracle11InsteadOfRemovedVersionCreateTable));
             } catch (PersistenceException e) {
                 ExceptionHandler.process(e);
                 return ExecutionResult.FAILURE;
             }
             
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
     }
     
     private class OracleVersionConversion implements IComponentConversion {

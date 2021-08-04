@@ -48,10 +48,11 @@ public class SetDefaultValueForNewerEmailFirstOfTDI35976 extends AbstractJobMigr
 			}
 		};
 		
+        boolean modified = false;
 		for(String componentName: filterList){
 			IComponentFilter filter = new NameComponentFilter(componentName);
 			try {
-				ModifyComponentsAction
+                modified |= ModifyComponentsAction
 						.searchAndModify(
 								item,
 								processType,
@@ -63,7 +64,11 @@ public class SetDefaultValueForNewerEmailFirstOfTDI35976 extends AbstractJobMigr
 			}
 		}
 		
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
     }
 
 }

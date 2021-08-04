@@ -55,7 +55,7 @@ public class ReplaceVarcharArrayWithVarcharIssueTDI35719 extends AbstractJobMigr
         };
 
         try {
-            ModifyComponentsAction.searchAndModify(item, processType, filter,
+            boolean modified = ModifyComponentsAction.searchAndModify(item, processType, filter,
                     Arrays.<IComponentConversion> asList(new IComponentConversion() {
 
                         @Override
@@ -92,7 +92,11 @@ public class ReplaceVarcharArrayWithVarcharIssueTDI35719 extends AbstractJobMigr
                             }
                         }
                     }));
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (PersistenceException e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

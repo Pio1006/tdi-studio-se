@@ -29,7 +29,6 @@ import org.talend.core.model.properties.Item;
 import org.talend.designer.core.model.utils.emf.talendfile.ElementParameterType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
-import org.talend.migration.IMigrationTask.ExecutionResult;
 
 /**
  * Change default driver type for Greenplum components
@@ -47,10 +46,11 @@ public class ChangeDefaultDriver4GreenplumMigrationTask extends AbstractAllJobMi
 				"tGreenplumInput", "tGreenplumOutputBulkExec", "tGreenplumOutput", "tGreenplumRow", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				"tGreenplumSCD" }; //$NON-NLS-1$
 
+        boolean modified = false;
 		for (String compName : compNames) {
 			IComponentFilter filter = new NameComponentFilter(compName); // $NON-NLS-1$
 			try {
-				ModifyComponentsAction.searchAndModify(item, processType, filter,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
 						Arrays.<IComponentConversion>asList(new IComponentConversion() {
 
 							public void transform(NodeType node) {
@@ -67,7 +67,11 @@ public class ChangeDefaultDriver4GreenplumMigrationTask extends AbstractAllJobMi
 			}
 		}
 
-		return ExecutionResult.SUCCESS_WITH_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_WITH_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 	}
 	
 	@Override

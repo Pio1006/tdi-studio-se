@@ -56,9 +56,9 @@ public class FileInputPositionalByteLengthMigrationTask extends AbstractJobMigra
         }
 
         IComponentFilter componentFilter = new NameComponentFilter(COMPONENT_NAME);
-
+        boolean modified = false;
         try {
-            ModifyComponentsAction.searchAndModify(item, processType, componentFilter,
+            modified = ModifyComponentsAction.searchAndModify(item, processType, componentFilter,
                     Arrays.<IComponentConversion> asList(new IComponentConversion() {
 
                         public void transform(NodeType node) {
@@ -78,7 +78,11 @@ public class FileInputPositionalByteLengthMigrationTask extends AbstractJobMigra
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;
         }
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 
     }
 }

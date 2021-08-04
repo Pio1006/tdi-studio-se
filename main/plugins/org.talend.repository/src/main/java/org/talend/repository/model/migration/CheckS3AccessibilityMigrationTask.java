@@ -26,7 +26,6 @@ import org.talend.core.model.components.filters.IComponentFilter;
 import org.talend.core.model.components.filters.NameComponentFilter;
 import org.talend.core.model.migration.AbstractJobMigrationTask;
 import org.talend.core.model.properties.Item;
-import org.talend.designer.core.model.utils.emf.talendfile.ElementParameterType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
 
@@ -42,8 +41,9 @@ public class CheckS3AccessibilityMigrationTask extends AbstractJobMigrationTask 
             return ExecutionResult.NOTHING_TO_DO;
         }
         IComponentFilter filter = new NameComponentFilter("tS3Connection");
+        boolean modified = false;
         try {
-            ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
+            modified = ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
                     .<IComponentConversion> asList(new IComponentConversion() {
 
                         public void transform(NodeType node) {
@@ -67,7 +67,11 @@ public class CheckS3AccessibilityMigrationTask extends AbstractJobMigrationTask 
             return ExecutionResult.FAILURE;
         }
 
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 
     }
 

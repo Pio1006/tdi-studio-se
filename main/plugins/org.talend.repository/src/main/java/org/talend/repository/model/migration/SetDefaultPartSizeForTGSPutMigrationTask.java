@@ -47,15 +47,20 @@ public class SetDefaultPartSizeForTGSPutMigrationTask extends AbstractJobMigrati
             }
         };
 
+        boolean modified = false;
         IComponentFilter componentFilter = new NameComponentFilter(componentName);
         try {
-            ModifyComponentsAction
+            modified = ModifyComponentsAction
                     .searchAndModify(item, processType, componentFilter, Collections.singletonList(defaultPartSize));
         } catch (PersistenceException e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;
         }
 
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
     }
 }

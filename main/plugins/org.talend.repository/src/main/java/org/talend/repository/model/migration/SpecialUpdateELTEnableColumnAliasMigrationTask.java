@@ -51,9 +51,10 @@ public class SpecialUpdateELTEnableColumnAliasMigrationTask extends AbstractAllJ
         if (getProject().getLanguage() != ECodeLanguage.JAVA || processType == null || disableOracleAlias) {
             return ExecutionResult.NOTHING_TO_DO;
         }
+        boolean modified = false;
         IComponentFilter filter = new NameComponentFilter("tELTOracleMap"); //$NON-NLS-1$
         try {
-            ModifyComponentsAction.searchAndModify(item, processType, filter,
+            modified = ModifyComponentsAction.searchAndModify(item, processType, filter,
                     Arrays.<IComponentConversion> asList(new IComponentConversion() {
 
                         public void transform(NodeType node) {
@@ -68,7 +69,11 @@ public class SpecialUpdateELTEnableColumnAliasMigrationTask extends AbstractAllJ
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;
         }
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
     }
 
     @Override

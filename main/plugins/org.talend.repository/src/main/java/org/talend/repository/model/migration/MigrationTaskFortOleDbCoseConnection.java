@@ -26,8 +26,6 @@ import org.talend.core.model.components.filters.IComponentFilter;
 import org.talend.core.model.components.filters.NameComponentFilter;
 import org.talend.core.model.migration.AbstractJobMigrationTask;
 import org.talend.core.model.properties.Item;
-import org.talend.core.model.properties.Project;
-import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.designer.core.model.utils.emf.talendfile.ElementParameterType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 import org.talend.designer.core.model.utils.emf.talendfile.ProcessType;
@@ -45,9 +43,10 @@ public class MigrationTaskFortOleDbCoseConnection extends AbstractJobMigrationTa
             return ExecutionResult.NOTHING_TO_DO;
         }
 
+        boolean modified = false;
         IComponentFilter filter = new NameComponentFilter("tOleDbInput"); //$NON-NLS-1$
         try {
-            ModifyComponentsAction.searchAndModify(item, processType, filter,
+            modified = ModifyComponentsAction.searchAndModify(item, processType, filter,
                     Arrays.<IComponentConversion> asList(new IComponentConversion() {
 
                         @Override
@@ -67,7 +66,11 @@ public class MigrationTaskFortOleDbCoseConnection extends AbstractJobMigrationTa
             return ExecutionResult.FAILURE;
         }
 
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 
     }
 

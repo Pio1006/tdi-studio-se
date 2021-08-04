@@ -47,11 +47,12 @@ public class SetTrustAllCertsLdapComponentsTDI41648 extends AbstractJobMigration
             }
         };
 
+        boolean modified = false;
         for (String name : componentsName) {
             IComponentFilter filter = new NameComponentFilter(name); //$NON-NLS-1$
 
             try {
-                ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter, Arrays
                         .<IComponentConversion> asList(changeAlwaysTrustValue));
             } catch (PersistenceException e) {
             	ExceptionHandler.process(e);
@@ -59,7 +60,11 @@ public class SetTrustAllCertsLdapComponentsTDI41648 extends AbstractJobMigration
             }
         }
 
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 	}
 
 }

@@ -48,10 +48,10 @@ public class ChangeLogLevel4tRedshiftInput extends AbstractJobMigrationTask {
         String[] componentsName = new String[] { "tRedshiftInput" }; //$NON-NLS-1$
 
         try {
-
+            boolean modified = false;
             for (String element : componentsName) {
                 IComponentFilter filter = new NameComponentFilter(element);
-                ModifyComponentsAction.searchAndModify(item, processType, filter,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
                         Arrays.<IComponentConversion> asList(new IComponentConversion() {
 
                             @Override
@@ -76,7 +76,11 @@ public class ChangeLogLevel4tRedshiftInput extends AbstractJobMigrationTask {
                         }));
             }
 
-            return ExecutionResult.SUCCESS_NO_ALERT;
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
             return ExecutionResult.FAILURE;

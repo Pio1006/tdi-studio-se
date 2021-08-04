@@ -70,17 +70,22 @@ public class RenameParamName4tS3XXServerEncryption extends AbstractAllJobMigrati
             }
         };
 
+        boolean modified = false;
         for (String name : compNames) {
             IComponentFilter filter = new NameComponentFilter(name);
             try {
-                ModifyComponentsAction.searchAndModify(item, processType, filter,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
                         Arrays.<IComponentConversion> asList(conversion));
             } catch (PersistenceException e) {
                 ExceptionHandler.process(e);
                 return ExecutionResult.FAILURE;
             }
         }
-        return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
     }
 
 }

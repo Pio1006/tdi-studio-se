@@ -51,12 +51,13 @@ public class AddKafkaExtraInfo extends AbstractJobMigrationTask {
             return ExecutionResult.NOTHING_TO_DO;
         }
 
+        boolean modified = false;
         for (String componentName : IMPACTED_COMPONENTS) {
 
             IComponentConversion addKafkaInfo = new AddKafkaInfo();
 
             try {
-                ModifyComponentsAction
+                modified |= ModifyComponentsAction
                         .searchAndModify(item, processType, new NameComponentFilter(componentName),
                                 java.util.Collections.singletonList(addKafkaInfo));
             } catch (Exception e) {
@@ -66,7 +67,16 @@ public class AddKafkaExtraInfo extends AbstractJobMigrationTask {
 
         }
 
-        return fullMigrationSucceded ? ExecutionResult.SUCCESS_NO_ALERT : ExecutionResult.FAILURE;
+        if (fullMigrationSucceded) {
+            if (modified) {
+                return ExecutionResult.SUCCESS_NO_ALERT;
+            } else {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
+        } else {
+            return ExecutionResult.FAILURE;
+        }
+
     }
 
     private class AddKafkaInfo implements IComponentConversion {

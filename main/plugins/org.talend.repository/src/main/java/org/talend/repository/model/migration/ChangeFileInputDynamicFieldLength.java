@@ -65,17 +65,22 @@ public class ChangeFileInputDynamicFieldLength extends AbstractAllJobMigrationTa
 
 		};
 
+        boolean modified = false;
 		for (String name : compNames) {
 			IComponentFilter filter = new NameComponentFilter(name);
 
 			try {
-				ModifyComponentsAction.searchAndModify(item, processType, filter,
+                modified |= ModifyComponentsAction.searchAndModify(item, processType, filter,
 						Arrays.<IComponentConversion>asList(conversion));
 			} catch (PersistenceException e) {
 				return ExecutionResult.FAILURE;
 			}
 		}
-		return ExecutionResult.SUCCESS_NO_ALERT;
+        if (modified) {
+            return ExecutionResult.SUCCESS_NO_ALERT;
+        } else {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
 	}
 
 	@Override

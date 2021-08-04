@@ -444,7 +444,19 @@ public class JavaJobScriptsExportWSWizardPage extends JavaJobScriptsExportWizard
         boolean isESBJob = false;
         
         boolean canESBMicroServiceDockerImage = PluginChecker.isDockerPluginLoaded();
-
+        Object bType = getProcessItem().getProperty().getAdditionalProperties().get(TalendProcessArgumentConstant.ARG_BUILD_TYPE);
+        
+        Map<JobExportType, String> map = BuildJobConstants.oldBuildTypeMap;
+        JobExportType jType = null;
+        if (bType != null) {
+	        for (JobExportType t : map.keySet()) {
+	            if (bType.toString().equals(map.get(t))) { // same build type
+	            	jType = t;
+	                break;
+	            }
+	        }
+        }
+        
         for (Object o : ((ProcessItem) processItem).getProcess().getNode()) {
             if (o instanceof NodeType) {
                 NodeType currentNode = (NodeType) o;
@@ -508,29 +520,28 @@ public class JavaJobScriptsExportWSWizardPage extends JavaJobScriptsExportWizard
                 }
             }
         }
-        String label2 = getCurrentExportType1().label;
-        // if the build type was set, try to select by default
-        if (nodes != null && nodes.length == 1) { // deal with one node only.
-            ProcessItem item = getProcessItem();
-            final Object buildType =
-                    item.getProperty().getAdditionalProperties().get(TalendProcessArgumentConstant.ARG_BUILD_TYPE);
-            if (buildType != null) {
-                Map<JobExportType, String> map = BuildJobConstants.oldBuildTypeMap;
-                for (JobExportType t : map.keySet()) {
-                    if (buildType.toString().equals(map.get(t))) { // same build type
-                        label2 = t.label;
-                        break;
-                    }
-                }
+
+        if (jType != null) {
+        	exportTypeCombo.setText(jType.label);
+        	
+        	if (jType.equals(JobExportType.OSGI)) {
+            	exportTypeCombo.remove(JobExportType.MSESB.label);
+            	exportTypeCombo.remove(JobExportType.MSESB_IMAGE.label);
+            	exportTypeCombo.setEnabled(false);
+            }
+            
+            if (jType.equals(JobExportType.MSESB) || jType.equals(JobExportType.MSESB_IMAGE)) {
+            	exportTypeCombo.remove(JobExportType.OSGI.label);
             }
         }
-
-        exportTypeCombo.setText(label2);
+        
         if (exportTypeFixed != null) {
             left.setVisible(false);
             optionsGroup.setVisible(false);
             exportTypeCombo.setText(exportTypeFixed.label);
         }
+        
+        
 
         chkButton = new Button(left, SWT.CHECK);
         chkButton.setText(Messages.getString("JavaJobScriptsExportWSWizardPage.extractZipFile")); //$NON-NLS-1$
@@ -992,7 +1003,6 @@ public class JavaJobScriptsExportWSWizardPage extends JavaJobScriptsExportWizard
                 setDefaultDestination();
             }
             updateDestinationGroup(true);
-            contextButton.setSelection(settings.getBoolean(STORE_CONTEXT_ID));
             if (getCurrentExportType1() == JobExportType.IMAGE) {
                 applyToChildrenButton.setSelection(settings.getBoolean(APPLY_TO_CHILDREN_ID));
             }
@@ -1280,8 +1290,9 @@ public class JavaJobScriptsExportWSWizardPage extends JavaJobScriptsExportWizard
             restoreWidgetValuesForPOJO();
             break;
         case OSGI:
-            createOptionsForOSGIESB(left, font);
+        	createOptionsForOSGIESB(optionsGroupComposite, font);
             restoreWidgetValuesForOSGI();
+            
             break;
         case MSESB:
             createOptionsForMSESB(left, font);
@@ -1295,8 +1306,7 @@ public class JavaJobScriptsExportWSWizardPage extends JavaJobScriptsExportWizard
             if (checkExport()) {
                 addDockerOptionsListener();
             }
-
-            contextButton.setSelection(false);
+            optionsGroupComposite.setVisible(false);
             break;
         case IMAGE:
             createOptionForDockerImage(left, font);
@@ -1354,38 +1364,6 @@ public class JavaJobScriptsExportWSWizardPage extends JavaJobScriptsExportWizard
         }
 
         if (getCurrentExportType1() != JobExportType.MSESB_IMAGE) {
-            addBSButton = new Button(optionsComposite, SWT.CHECK | SWT.LEFT);
-            addBSButton.setText("Add maven script"); //$NON-NLS-1$
-            addBSButton.setFont(font);
-
-            addBSButton.addSelectionListener(new SelectionAdapter() {
-
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    String destinationValue = getDestinationValue();
-                    if (destinationValue.endsWith(OUTPUT_FILE_SUFFIX)) {
-                        destinationValue = destinationValue.substring(0, destinationValue.indexOf(OUTPUT_FILE_SUFFIX))
-                                + getOutputSuffix();
-                    }
-                    setDestinationValue(destinationValue);
-                }
-            });
-        }
-
-        contextButton = new Button(optionsComposite, SWT.CHECK | SWT.LEFT);
-        contextButton.setText("Only export the default context"); //$NON-NLS-1$
-        contextButton.setFont(font);
-        // contextButton.setEnabled(false);
-        contextButton.setVisible(PluginChecker.isTIS());
-        contextButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                // onlyExportDefaultContext = contextButton.getSelection();
-            }
-        });
-
-        if (getCurrentExportType1() != JobExportType.MSESB_IMAGE) {
             exportMSAsZipButton = new Button(optionsComposite, SWT.CHECK | SWT.LEFT);
             exportMSAsZipButton.setText("Export as ZIP"); //$NON-NLS-1$
             exportMSAsZipButton.setFont(getFont());
@@ -1423,24 +1401,7 @@ public class JavaJobScriptsExportWSWizardPage extends JavaJobScriptsExportWizard
         if (!PluginChecker.isPluginLoaded(PluginChecker.EXPORT_JOB_PLUGIN_ID)) {
             return;
         }
-
-        addBSButton = new Button(optionsComposite, SWT.CHECK | SWT.LEFT);
-        addBSButton.setText("Add maven script"); //$NON-NLS-1$
-        addBSButton.setFont(font);
-
-        addBSButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                String destinationValue = getDestinationValue();
-                if (destinationValue.endsWith(OUTPUT_FILE_SUFFIX)) {
-                    destinationValue = destinationValue.substring(0, destinationValue.indexOf(OUTPUT_FILE_SUFFIX))
-                            + getOutputSuffix();
-                }
-                setDestinationValue(destinationValue);
-            }
-        });
-
+        optionsComposite.setVisible(false);
     }
 
     private void createOptionForDockerImage(Composite optionsGroup, Font font) {

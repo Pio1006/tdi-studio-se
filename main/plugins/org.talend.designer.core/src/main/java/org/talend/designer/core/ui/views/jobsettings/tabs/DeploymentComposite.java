@@ -14,6 +14,7 @@ package org.talend.designer.core.ui.views.jobsettings.tabs;
 
 import static org.talend.repository.utils.MavenVersionUtils.containsKey;
 import static org.talend.repository.utils.MavenVersionUtils.get;
+import static org.talend.repository.utils.MavenVersionUtils.put;
 import static org.talend.repository.utils.MavenVersionUtils.getDefaultVersion;
 import static org.talend.repository.utils.MavenVersionUtils.isAdditionalPropertiesNull;
 import static org.talend.repository.utils.MavenVersionUtils.isValidMavenVersion;
@@ -360,8 +361,11 @@ public class DeploymentComposite extends AbstractTabComposite {
                     }
                 }
                 if (foundType == null) {// set the first one by default
-                    foundType = validBuildTypes[0];
+                    foundType = validBuildTypes[0];                   
                 }
+                Command cmd = new MavenDeploymentValueChangeCommand(getObject(),
+                        TalendProcessArgumentConstant.ARG_BUILD_TYPE, foundType.getName());
+                getCommandStack().execute(cmd);
                 buildTypeCombo.setSelection(new StructuredSelection(foundType));
             }
         }

@@ -57,8 +57,6 @@ public class ChangeHadoopVersionValue4TDQComponents extends AbstractJobMigration
                         version.setValue("HADOOP_1_0_0"); //$NON-NLS-1$
                     }else if (value.startsWith("hadoop-core-1.0.0.jar;commons-logging-1.1.1.jar;hdp-dummy.jar")) { //$NON-NLS-1$
                         version.setValue("HDP_1_0"); //$NON-NLS-1$
-                    }else if (value.startsWith("hadoop-auth-2.0.0-cdh4.0.1.jar;hadoop-common-2.0.0-cdh4.0.1.jar;hadoop-hdfs-2.0.0-cdh4.0.1.jar;hadoop-core-2.0.0-mr1-cdh4.0.1.jar;protobuf-java-2.4.0a.jar;slf4j-api-1.6.1.jar;slf4j-log4j12-1.6.1.jar;guava-11.0.2.jar;commons-logging-1.1.1.jar")) { //$NON-NLS-1$
-                        version.setValue("Cloudera_CDH4"); //$NON-NLS-1$
                     }
                 }
             }

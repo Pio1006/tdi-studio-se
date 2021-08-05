@@ -4,12 +4,21 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import org.talend.parquet.data.simple.NanoTime;
 
 import jodd.time.JulianDate;
 
 public class NanoTimeUtils {
+	
+	/**
+	 * Number of days between Julian day epoch (January 1, 4713 BC) and Unix day
+	 * epoch (January 1, 1970). The value of this constant is {@value}.
+	 */
+	public static final long JULIAN_EPOCH_OFFSET_DAYS = 2440588;
+	private static final long MILLIS_IN_DAY = TimeUnit.DAYS.toMillis(1);
+	private static final long NANOS_PER_MILLISECOND = TimeUnit.MILLISECONDS.toNanos(1);
 
 	static final long NANOS_PER_HOUR = java.util.concurrent.TimeUnit.HOURS.toNanos(1);
 	static final long NANOS_PER_MINUTE = java.util.concurrent.TimeUnit.MINUTES.toNanos(1);
@@ -73,5 +82,18 @@ public class NanoTimeUtils {
 		Timestamp ts = new Timestamp(calendar.getTimeInMillis());
 		ts.setNanos((int) nanos);
 		return ts;
+	}
+	
+	/**
+	 * Returns timestamp millis from NanoTime type value.
+	 *
+	 * @param nt NanoTime value
+	 * @return timestamp in millis
+	 */
+	public static long getTimestampMillis(NanoTime nt) {
+		long timeOfDayNanos = nt.getTimeOfDayNanos();
+		int julianDay = nt.getJulianDay();
+
+		return (julianDay - JULIAN_EPOCH_OFFSET_DAYS) * MILLIS_IN_DAY + (timeOfDayNanos / NANOS_PER_MILLISECOND);
 	}
 }

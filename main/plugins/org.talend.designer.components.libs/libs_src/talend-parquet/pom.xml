@@ -5,7 +5,7 @@
 
 	<groupId>org.talend.components</groupId>
 	<artifactId>talend-parquet</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 
 	<properties>
 		<parquet.version>1.10.1</parquet.version>

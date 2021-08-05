@@ -1,0 +1,21 @@
+<%@ jet 
+%>
+<%
+    if(dbproperties == null || ("\"\"").equals(dbproperties) || ("").equals(dbproperties)) {
+%>
+        String url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?enabledTLSProtocols=TLSv1.2,TLSv1.1,TLSv1";
+<%
+    } else {
+%>
+        String properties_<%=cid%> = <%=dbproperties%>;
+		if (properties_<%=cid%> == null || properties_<%=cid%>.trim().length() == 0) {
+			properties_<%=cid%> += "enabledTLSProtocols=TLSv1.2,TLSv1.1,TLSv1";
+		}else {
+            if (!properties_<%=cid%>.contains("enabledTLSProtocols=")) {
+                properties_<%=cid%> += "&enabledTLSProtocols=TLSv1.2,TLSv1.1,TLSv1";
+            }
+        }
+        String url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + <%=dbproperties%>;
+<%
+    }
+%>

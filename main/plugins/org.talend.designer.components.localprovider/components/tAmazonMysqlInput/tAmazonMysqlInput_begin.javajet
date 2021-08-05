@@ -28,14 +28,8 @@ imports="
 	    }
 	    
 		public void setURL(INode node) {
-			
-			if(dbproperties == null || ("\"\"").equals(dbproperties) || ("").equals(dbproperties)) {
 %>
-				String url_<%=cid%> = "jdbc:mysql://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%>;
-<%
-	        } else {
-%>
-				String url_<%=cid%> = "jdbc:mysql://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + <%=dbproperties%>;
+<%@ include file="@{org.talend.designer.components.localprovider}/components/templates/Mysql/jdbcurl4basic.javajet"%>
 <%
 	        }		
 		}

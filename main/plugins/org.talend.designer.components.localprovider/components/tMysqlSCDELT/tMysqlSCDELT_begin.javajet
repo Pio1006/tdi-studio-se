@@ -60,13 +60,9 @@ if(columnList != null && columnList.size() > 0) {
 		}
         %>
         java.lang.Class.forName("<%=drverClass%>");
-        String dbProperties_<%=cid%> = <%if(dbproperties == null || dbproperties.trim().length() == 0) {%>null<%} else {%><%=dbproperties%><%}%>;
-        String url_<%=cid%> = null;
-        if(dbProperties_<%=cid%> == null || dbProperties_<%=cid%>.trim().length() == 0) {
-            url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%>;
-        } else {
-            url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + dbProperties_<%=cid%>;
-        }
+        
+        <%@ include file="@{org.talend.designer.components.localprovider}/components/templates/Mysql/jdbcurl4basic.javajet"%>
+        
         String dbUser_<%=cid %> = <%=dbuser%>;
 
         <%

@@ -157,19 +157,12 @@ if(useExistingConnection) {
 	<%
 } else {
 	String javaDbDriver   = "org.gjt.mm.mysql.Driver";
+	
+	final boolean supportBulkComponent = false;
 	%>
-	String dbProperties_<%=cid%> = <%=dbproperties%>;
-	String url_<%=cid%> = null;
-	if(dbProperties_<%=cid%> == null || dbProperties_<%=cid%>.trim().length() == 0) {
-	    url_<%=cid%> = "jdbc:mysql://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + "rewriteBatchedStatements=true";
-	} else {
-		String properties_<%=cid%> = <%=dbproperties%>;
-		if (!properties_<%=cid%>.contains("rewriteBatchedStatements")) {
-			properties_<%=cid%> += "&rewriteBatchedStatements=true";
-		}
-
-	    url_<%=cid%> = "jdbc:mysql://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + properties_<%=cid%>;
-	}
+	
+	<%@ include file="@{org.talend.designer.components.localprovider}/components/templates/Mysql/jdbcurl4connection_output.javajet"%>
+	
     String dbUser_<%=cid %> = <%=dbuser%>;
 
     <%

@@ -21,18 +21,9 @@ imports="
 			if("MARIADB".equals(dbVersion)){
 				jdbcURL = "jdbc:mariadb";
 			}
-			if(dbproperties == null || ("\"\"").equals(dbproperties) || ("").equals(dbproperties)) {
 %>
-				String url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?allowLoadLocalInfile=true";
+<%@ include file="@{org.talend.designer.components.localprovider}/components/templates/Mysql/jdbcurl4bulk.javajet"%>
 <%
-	        } else {
-				if (!dbproperties.contains("allowLoadLocalInfile")) {
-					dbproperties += " + \"&allowLoadLocalInfile=true\"";
-				}
-%>
-				String url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + <%=dbproperties%> ;
-<%
-	        }		
 		}
 		
 		public String getDirverClassName(INode node){

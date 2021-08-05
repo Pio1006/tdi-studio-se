@@ -78,21 +78,10 @@ java.sql.Connection conn_<%=cid%> = null;
 		%>
 		String driverClass_<%=cid%> = "<%=drverClass%>";
 		Class.forName(driverClass_<%=cid%>).newInstance();
+		
+		<%@ include file="@{org.talend.designer.components.localprovider}/components/templates/Mysql/jdbcurl4bulk.javajet"%>
+		
 		<%
-		if(dbproperties == null || ("\"\"").equals(dbproperties) || ("").equals(dbproperties)) {
-		%>
-			String url_<%=cid%> = "<%=jdbcURL%>://" + <%=host%> + ":" + <%=port%> + "/" + <%=dbName%> + "?allowLoadLocalInfile=true";
-		<%
-		} else {
-		%>
-			<%
-				String localFileParam = "\"\"";
-				if (!(dbproperties.contains("allowLoadLocalInfile"))) {
-				localFileParam = "\"&allowLoadLocalInfile=true\"" ;
-			} %>
-			String url_<%=cid%> = "<%=jdbcURL%>://" + <%=host%> + ":" + <%=port%> + "/" + <%=dbName%> + "?" + <%=dbproperties%> + <%=localFileParam %>;
-		<%
-		}
 		String passwordFieldName = "__PASS__";
 		%>
 		<%@ include file="@{org.talend.designer.components.localprovider}/components/templates/password.javajet"%>

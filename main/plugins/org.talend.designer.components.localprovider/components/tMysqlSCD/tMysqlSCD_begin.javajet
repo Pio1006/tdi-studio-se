@@ -82,17 +82,8 @@ if(inputSchema != null && inputSchema.size() > 0 && outputSchema != null && outp
 		}
         %>
         java.lang.Class.forName("<%=drverClass%>");
-        <%
-        if(dbproperties == null || ("\"\"").equals(dbproperties) || ("").equals(dbproperties)) {
-            %>
-            String connectionString_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%>;
-            <%
-        } else {
-            %>
-            String connectionString_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + <%=dbproperties%>;
-            <%
-        }       
-        %>
+       
+        <%@ include file="@{org.talend.designer.components.localprovider}/components/templates/Mysql/jdbcurl4basic.javajet"%>
 	        
 		<%
 		String passwordFieldName = "__PASS__";

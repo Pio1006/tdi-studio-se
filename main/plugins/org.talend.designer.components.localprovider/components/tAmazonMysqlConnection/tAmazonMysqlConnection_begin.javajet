@@ -11,25 +11,9 @@ imports="
 	
 		public void createURL(INode node) {
 			super.createURL(node);
+			final boolean supportBulkComponent = false;
 %>
-<%
-			if(dbproperties == null || ("\"\"").equals(dbproperties) || ("").equals(dbproperties)) {
-%>
-		String url_<%=cid%> = "jdbc:mysql://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + "rewriteBatchedStatements=true";
-<%
-			} else {
-%>
-		String proprtties_<%=cid%> = <%=dbproperties%>;
-		if (proprtties_<%=cid%> == null || proprtties_<%=cid%>.trim().length() == 0) {
-			proprtties_<%=cid%> += "rewriteBatchedStatements=true";
-		}else if (proprtties_<%=cid%> != null && !proprtties_<%=cid%>.contains("rewriteBatchedStatements")) {
-			proprtties_<%=cid%> += "&rewriteBatchedStatements=true";
-		}
-		
-		String url_<%=cid%> = "jdbc:mysql://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + proprtties_<%=cid%>;
-<%
-			}
-%>
+<%@ include file="@{org.talend.designer.components.localprovider}/components/templates/Mysql/jdbcurl4connection_output.javajet"%>
 <%	
 		}
 		

@@ -39,7 +39,8 @@ public final class TaCoKitNode {
 
     private final ComponentDetail detail;
 
-    private static final Set<String> MIGRATION_EXCLUSIONS = new HashSet<>(Arrays.asList(EParameterName.UNIQUE_NAME.getName(), TACOKIT_COMPONENT_ID));
+    private static final Set<String> MIGRATION_EXCLUSIONS = new HashSet<>(
+            Arrays.asList(EParameterName.UNIQUE_NAME.getName(), EParameterName.ACTIVATE.getName(), TACOKIT_COMPONENT_ID));
 
     public TaCoKitNode(final NodeTypeImpl node) {
         Objects.requireNonNull(node, "Node should not be null");

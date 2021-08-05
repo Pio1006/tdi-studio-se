@@ -20,21 +20,18 @@ imports="
 <%
 			if(dbproperties == null || ("\"\"").equals(dbproperties) || ("").equals(dbproperties)) {
 %>
-		String url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + "rewriteBatchedStatements=true&enabledTLSProtocols=TLSv1.2,TLSv1.1,TLSv1";
+		String url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + "rewriteBatchedStatements=true";
 <%
 			} else {
 %>
 		String properties_<%=cid%> = <%=dbproperties%>;
 		if (properties_<%=cid%> == null || properties_<%=cid%>.trim().length() == 0) {
-			properties_<%=cid%> += "rewriteBatchedStatements=true&allowLoadLocalInfile=true&enabledTLSProtocols=TLSv1.2,TLSv1.1,TLSv1";
+			properties_<%=cid%> += "rewriteBatchedStatements=true&allowLoadLocalInfile=true";
 		}else if (properties_<%=cid%> != null && !properties_<%=cid%>.contains("rewriteBatchedStatements")) {
 			properties_<%=cid%> += "&rewriteBatchedStatements=true";
 		}
 		if (properties_<%=cid%> != null && !properties_<%=cid%>.contains("allowLoadLocalInfile")) {
 			properties_<%=cid%> += "&allowLoadLocalInfile=true";
-		}
-		if (properties_<%=cid%> != null && !properties_<%=cid%>.contains("enabledTLSProtocols=")) {
-			properties_<%=cid%> += "&enabledTLSProtocols=TLSv1.2,TLSv1.1,TLSv1";
 		}
 		
 		String url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + properties_<%=cid%>;

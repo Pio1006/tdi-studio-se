@@ -65,7 +65,9 @@ public class FakeSetMysqlComponentValueMigrationTask extends AbstractJobMigratio
                             String value = TalendQuoteUtils.removeQuotes(parameter.getValue());
                             if (StringUtils.isBlank(value)) {
                                 parameter.setValue("localhost");
-                                generateReportRecord(new MigrationReportRecorder(task, MigrationReportRecorder.MigrationOperationType.ADD, item, node, "HOST", null, null));
+                                generateReportRecord(
+                                        new MigrationReportRecorder(task, MigrationReportRecorder.MigrationOperationType.ADD,
+                                                item, node, "HOST", null, "localhost"));
                                 ElementParameterType passparameter = ComponentUtilities.getNodeProperty(node, "PASS");
                                 passparameter.setValue("");
                                 generateReportRecord(new MigrationReportRecorder(task,

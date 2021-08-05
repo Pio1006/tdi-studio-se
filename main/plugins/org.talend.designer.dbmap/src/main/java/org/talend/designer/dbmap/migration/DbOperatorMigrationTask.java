@@ -79,7 +79,7 @@ public class DbOperatorMigrationTask extends AbstractJobMigrationTask {
                 factory.save(item, true);
                 return ExecutionResult.SUCCESS_WITH_ALERT;
             } else {
-                return ExecutionResult.SUCCESS_NO_ALERT;
+                return ExecutionResult.NOTHING_TO_DO;
             }
         } catch (Exception e) {
             ExceptionHandler.process(e);

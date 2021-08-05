@@ -58,7 +58,7 @@ public class FakeSetMysqlConnectionValueMigrationTask extends AbstractItemMigrat
                 if (StringUtils.isBlank(dbConnection.getServerName())) {
                     dbConnection.setServerName("localhost");
                     generateReportRecord(new MigrationReportRecorder(this, MigrationReportRecorder.MigrationOperationType.ADD,
-                            connectionItem, null, "port", null, null));
+                            connectionItem, null, "port", null, "localhost"));
                     dbConnection.setPassword("");
                     generateReportRecord(new MigrationReportRecorder(this, MigrationReportRecorder.MigrationOperationType.DELETE,
                             connectionItem, null, "password", null, null));

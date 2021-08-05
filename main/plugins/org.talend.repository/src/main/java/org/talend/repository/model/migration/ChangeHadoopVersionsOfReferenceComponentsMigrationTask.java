@@ -101,8 +101,6 @@ public class ChangeHadoopVersionsOfReferenceComponentsMigrationTask extends Abst
     public void setValue(NodeType node, ElementParameterType ept, String param) {
         if ("CLOUDERA_0.20_CDH3U1".equals(ept.getValue()) || "Cloudera_0_20_CDH3U1".equals(ept.getValue())) {//$NON-NLS-1$ //$NON-NLS-2$
             ComponentUtilities.setNodeValue(node, param, "Cloudera_CDH3"); //$NON-NLS-1$
-        } else if ("CLOUDERA_CDH4".equals(ept.getValue())) {//$NON-NLS-1$
-            ComponentUtilities.setNodeValue(node, param, "Cloudera_CDH4");//$NON-NLS-1$
         } else if ("MapR".equalsIgnoreCase(ept.getValue())) {//$NON-NLS-1$
             ComponentUtilities.setNodeValue(node, param, "MAPR1");//$NON-NLS-1$
         } else if ("MapR2".equals(ept.getValue())) {//$NON-NLS-1$

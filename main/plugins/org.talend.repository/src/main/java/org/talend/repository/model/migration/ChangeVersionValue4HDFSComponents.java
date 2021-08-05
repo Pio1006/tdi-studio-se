@@ -60,8 +60,6 @@ public class ChangeVersionValue4HDFSComponents extends AbstractJobMigrationTask 
                         version.setValue("APACHE_0_20_204"); //$NON-NLS-1$
                     } else if (value.startsWith("hadoop-0.20.2-cdh3u1-core.jar")) { //$NON-NLS-1$
                         version.setValue("Cloudera_0_20_CDH3U1"); //$NON-NLS-1$
-                    } else if (value.startsWith("hadoop-hdfs-2.0.0-cdh4.0.1.jar")) { //$NON-NLS-1$
-                        version.setValue("Cloudera_CDH4"); //$NON-NLS-1$
                     } else if (value.startsWith("hadoop-0.20.2-core.jar")) { //$NON-NLS-1$
                         version.setValue("APACHE_0_20_2"); //$NON-NLS-1$
                     } else if (value.startsWith("hadoop-0.20.2-dev-core.jar")) { //$NON-NLS-1$

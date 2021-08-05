@@ -59,7 +59,6 @@ public class MigrateDeprecatedHadoopDistribution1 extends AbstractAllJobMigratio
                     "tHiveConnection", "tHiveRow", "tHiveInput", "tHiveLoad", "tHiveCreateTable", "tELTHiveMap" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
             values.put("HDP_1_0", "HDP_1_2"); //$NON-NLS-1$ //$NON-NLS-2$
-            values.put("Cloudera_CDH3", "Cloudera_CDH4"); //$NON-NLS-1$ //$NON-NLS-2$
             values.put("MAPR1", "MAPR2"); //$NON-NLS-1$ //$NON-NLS-2$
             values.put("MapR_EMR", "APACHE_1_0_3_EMR"); //$NON-NLS-1$ //$NON-NLS-2$
 

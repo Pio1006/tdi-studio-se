@@ -52,10 +52,6 @@ public class RenameSparkVersions extends AbstractJobMigrationTask {
                     for (int i = 0; i < elementParameters.size(); i++) {
                         ElementParameterType param = elementParameters.get(i);
                         if ("SPARK_VERSION".equals(param.getName())) { //$NON-NLS-1$
-                            if ("Cloudera_CDH51".equals(param.getValue())) { //$NON-NLS-1$
-                                param.setValue("Cloudera_CDH5_1"); //$NON-NLS-1$
-                                modified = true;
-                            }
                             if ("MAPR_410".equals(param.getValue())) { //$NON-NLS-1$
                                 param.setValue("MAPR410"); //$NON-NLS-1$
                                 modified = true;

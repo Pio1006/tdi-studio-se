@@ -63,6 +63,7 @@ abstract class Manager {
         return additionalParams;
     }
     
+    //this is not good way, it make trouble if want to add jdbc parameters, that need a complex string append action, not good, we should avoid that
     public String difineConnParam(){
         StringBuilder javaCode = new StringBuilder();
         javaCode.append("String driverClass_"+cid+"=\"" + getDriver()+ "\";\r\n");
@@ -2428,9 +2429,41 @@ if(columnList != null && columnList.size() > 0) {
         <%
         boolean useExistingConnection = "true".equals(ElementParameterParser.getValue(node,"__USE_EXISTING_CONNECTION__"));
         if(!useExistingConnection) {
-        %>
+            if(("MYSQL").equals(dbType) {
+                String dbproperties = ElementParameterParser.getValue(node,"__PROPERTIES__");
+                String dbhost = ElementParameterParser.getValue(node, "__HOST__");
+                String dbport = ElementParameterParser.getValue(node, "__PORT__");
+                String dbname = ElementParameterParser.getValue(node, "__DBNAME__");
+                String userName = ElementParameterParser.getValue(node, "__USER__");
+                
+                String dbVersion = ElementParameterParser.getValue(node, "__DB_MYSQL_VERSION__");
+                
+                String jdbcURL = "jdbc:mysql";
+                if("MARIADB".equals(dbVersion)){
+                	jdbcURL = "jdbc:mariadb";
+                }
+                
+                String driverClass = null;
+                if("MARIADB".equals(dbVersion)){
+                    driverClass = "org.mariadb.jdbc.Driver";
+                } else if ("MYSQL_8".equals(dbVersion)){
+                    driverClass = "com.mysql.cj.jdbc.Driver";
+                } else {
+                    driverClass = "com.mysql.jdbc.Driver";
+                }
+                %>
+                
+                String driverClass_<%=cid%> = "<%=driverClass%>";
+                
+                <%@ include file="@{org.talend.designer.components.localprovider}/components/templates/Mysql/jdbcurl4basic.javajet"%>
+                
+                String dbUser_<%=cid%> = <%=userName%>;
+            <%
+            } else {
+            %>
             <%=manager.difineConnParam()%>
             <%
+            }
             log4jCodeGenerateUtil.debugConnectionParams(node);
             //log4jCodeGenerateUtil.connect_begin();
         }

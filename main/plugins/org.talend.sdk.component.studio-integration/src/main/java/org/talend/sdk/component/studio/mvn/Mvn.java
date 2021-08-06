@@ -49,7 +49,7 @@ public final class Mvn {
         switch (segments.length) {
         // support some optional values 3: g:a:v, 4: g:a:t:v
         case 3:
-            segments = new String[] { segments[0], segments[1], "jar", segments[2], "compile" };
+            segments = new String[]{ segments[0], segments[1], "jar", segments[2], "compile" };
             break;
 
         case 4:
@@ -65,7 +65,7 @@ public final class Mvn {
     }
 
     public static <T> T withDependencies(final File module, final String resource, final boolean acceptProvided,
-            final Function<Stream<String>, T> fn) throws IOException {
+                                         final Function<Stream<String>, T> fn) throws IOException {
         return withResource(module, resource, s -> {
             if (s == null) {
                 return fn.apply(Stream.empty());
@@ -81,11 +81,16 @@ public final class Mvn {
     private static Set<String> toDependencies(final InputStream deps, final boolean acceptProvided) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(deps))) {
             // this logic excludes  (optional)  intentionally
-            return reader.lines().map(String::trim).filter(s -> !s.isEmpty() || s.split(":").length < 4)
+            return reader.lines()
+                    .map(s -> s.replaceAll(" -- module.*", "")) // remove java9+ module output
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty() || s.split(":").length < 4)
                     .filter(s -> !s.endsWith(":test"))
                     .filter(s -> (acceptProvided && s.endsWith(":provided"))
                             || (!acceptProvided && (s.endsWith("compile") || s.endsWith("runtime"))))
-                    .filter(s -> !s.contains("log4j")).map(Mvn::locationToMvn).collect(toSet());
+                    .filter(s -> !s.contains("log4j"))
+                    .map(Mvn::locationToMvn)
+                    .collect(toSet());
         }
     }
 

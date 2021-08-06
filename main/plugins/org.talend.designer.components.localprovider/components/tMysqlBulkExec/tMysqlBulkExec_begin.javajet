@@ -40,9 +40,9 @@ if(("\"GBK\"").equals(encoding)){
 	charset = encoding;
 }
 
-String host = ElementParameterParser.getValue(node, "__HOST__");
-String port = ElementParameterParser.getValue(node, "__PORT__");
-String dbName = ElementParameterParser.getValue(node, "__DBNAME__");
+String dbhost = ElementParameterParser.getValue(node, "__HOST__");
+String dbport = ElementParameterParser.getValue(node, "__PORT__");
+String dbname = ElementParameterParser.getValue(node, "__DBNAME__");
 String dbproperties = ElementParameterParser.getValue(node, "__PROPERTIES__");
 String table = ElementParameterParser.getValue(node, "__TABLE__");
 String userName = ElementParameterParser.getValue(node, "__USER__");

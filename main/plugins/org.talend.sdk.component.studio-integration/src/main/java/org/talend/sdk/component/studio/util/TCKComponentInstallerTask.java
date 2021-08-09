@@ -47,6 +47,13 @@ abstract public class TCKComponentInstallerTask extends BaseComponentInstallerTa
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TCKComponentInstallerTask.class);
 
+    private static final String SYS_PROP_TCK = "tck.update";
+    
+    protected boolean updateTck() {
+        String prop = System.getProperty(SYS_PROP_TCK, "false");
+        return Boolean.valueOf(prop);
+    }
+    
     /**
      * Get car file
      * 
@@ -76,6 +83,12 @@ abstract public class TCKComponentInstallerTask extends BaseComponentInstallerTa
 
     @Override
     public boolean needInstall() {
+        
+        if (this.updateTck()) {
+            LOGGER.info("System property: {} is true", SYS_PROP_TCK);
+            return true;
+        }
+        
         boolean toInstall = false;
         Set<ComponentGAV> tcompv1Gavs = this.getComponentGAV(IComponentInstallerTask.COMPONENT_TYPE_TCOMPV1);
 

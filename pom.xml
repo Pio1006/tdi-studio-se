@@ -33,8 +33,6 @@
 	</repositories>
 	<modules>
 		<module>main/features/org.talend.designer.feature</module>
-		<module>main/features/org.talend.gmf.feature</module>
-		<module>main/features/org.talend.designer.business.feature</module>
         <module>main/features/org.talend.fragment.jars.di.feature</module>
 		<module>main/features/org.talend.rcp.branding.tos.feature</module>
 		<module>main/features/org.talend.rcp.branding.tos.test.feature</module>
@@ -49,7 +47,6 @@
 		<module>main/plugins/org.talend.repository.generic</module>
 		<module>main/plugins/org.talend.designer.abstractmap</module>
 		<module>main/plugins/org.talend.designer.alfrescooutput</module>
-		<module>main/plugins/org.talend.designer.business.diagram</module>
 		<module>main/plugins/org.talend.designer.codegen</module>
 		<module>main/plugins/org.talend.designer.components.exchange</module>
 		<module>main/plugins/org.talend.designer.components.libs</module>

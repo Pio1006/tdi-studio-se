@@ -5,7 +5,6 @@
   <copyright url="http://www.example.com/copyright">[Enter Copyright Description here.]</copyright>  
   <license>[Enter License Description here.]</license>  
   <requires>
-    <import feature="org.talend.designer.business.feature" version="0.0.0" match="greaterOrEqual"/>
     <import feature="org.talend.help.feature" version="0.0.0" match="greaterOrEqual"/>
     <import feature="org.talend.sbi.feature" version="0.0.0" match="greaterOrEqual"/>
     <import feature="org.talend.spagic.feature" version="0.0.0" match="greaterOrEqual"/>

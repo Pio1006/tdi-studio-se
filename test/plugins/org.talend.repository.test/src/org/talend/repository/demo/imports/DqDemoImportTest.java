@@ -91,14 +91,6 @@ public class DqDemoImportTest extends DemosImportTest {
 		// test the routine items under DQ_Demo.zip
 		doRoutinesItemsTest(rootPath);
 
-		// test the business process items under DQ_Demo.zip
-		int currentBusinessItemsSize = ProxyRepositoryFactory.getInstance()
-				.getAll(ERepositoryObjectType.BUSINESS_PROCESS).size();
-		Assert.assertTrue(currentBusinessItemsSize > 0);
-		List<File> demoBusinessItemsFiles = getDemoItemFileList(rootPath + File.separator + bussniessProcessPath);
-		Assert.assertTrue(demoBusinessItemsFiles.size() > 0);
-		Assert.assertEquals(demoBusinessItemsFiles.size(), currentBusinessItemsSize);
-
 		// test the documention items under DQ_Demo.zip
 		int currentDocItemsSize = ProxyRepositoryFactory.getInstance().getAll(ERepositoryObjectType.DOCUMENTATION)
 				.size();
@@ -146,7 +138,6 @@ public class DqDemoImportTest extends DemosImportTest {
 		map.put(rootPath + File.separator + processItemPath, FileConstants.ITEM_EXTENSION);
 		map.put(rootPath + File.separator + contextItemPath, FileConstants.ITEM_EXTENSION);
 		map.put(rootPath + File.separator + connectionItemPath, FileConstants.ITEM_EXTENSION);
-		map.put(rootPath + File.separator + bussniessProcessPath, FileConstants.ITEM_EXTENSION);
 		map.put(rootPath + File.separator + documentionPath, FileConstants.ITEM_EXTENSION);
 		map.put(rootPath + File.separator + tdqProfilingAnaPath, FileConstants.ANA_EXTENSION);
 		map.put(rootPath + File.separator + tdqProfilingRepPath, FileConstants.REP_EXTENSION);

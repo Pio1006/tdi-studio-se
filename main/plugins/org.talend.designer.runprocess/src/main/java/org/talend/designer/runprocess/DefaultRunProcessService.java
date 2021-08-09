@@ -1050,5 +1050,10 @@ public class DefaultRunProcessService implements IRunProcessService {
     public boolean getMavenPrefOptionStatus(String prefName) {
         return PomIdsHelper.getMavenPrefOptionStatus(prefName);
     }
+    
+    @Override
+    public void deleteOldVersionTalendJobProject(IRepositoryViewObject object) {
+        TalendJavaProjectManager.deleteOldVersionTalendJobProject(object, true);
+    }
 
 }

@@ -54,8 +54,31 @@
         <ITEM NAME="STATIC_CREDENTIALS" VALUE="STATIC_CREDENTIALS" SHOW_IF="true" />
         <ITEM NAME="INHERIT_CREDENTIALS" VALUE="INHERIT_CREDENTIALS" SHOW_IF="true" />
         <ITEM NAME="WEB_TOKEN" VALUE="WEB_TOKEN" SHOW_IF="true" />
+		<ITEM NAME="PROFILE_INHERIT_CREDENTIALS" VALUE="PROFILE_INHERIT_CREDENTIALS" SHOW_IF="true" />
       </ITEMS>
     </PARAMETER>
+
+		<PARAMETER
+				NAME="PROFILE_PATH"
+				FIELD="FILE"
+				NUM_ROW="21"
+				REQUIRED="false"
+				GROUP="CONNECTION_CONFIG"
+				SHOW_IF="(USE_EXISTING_CONNECTION == 'false') AND (CREDENTIAL_PROVIDER == 'PROFILE_INHERIT_CREDENTIALS')"
+		>
+			<DEFAULT>""</DEFAULT>
+		</PARAMETER>
+
+		<PARAMETER
+				NAME="PROFILE_NAME"
+				FIELD="TEXT"
+				NUM_ROW="21"
+				REQUIRED="false"
+				GROUP="CONNECTION_CONFIG"
+				SHOW_IF="(USE_EXISTING_CONNECTION == 'false') AND (CREDENTIAL_PROVIDER == 'PROFILE_INHERIT_CREDENTIALS')"
+		>
+			<DEFAULT>""</DEFAULT>
+		</PARAMETER>
 
     <PARAMETER
       NAME="ACCESS_KEY"
@@ -551,6 +574,45 @@
 	        <ITEM NAME="BUCKET_OWNER_FULL_CONTROL" VALUE="&quot;BucketOwnerFullControl&quot;" />
           </ITEMS>
         </PARAMETER>
+        <PARAMETER
+          NAME="ENABLE_OBJECT_LOCK"
+          FIELD="CHECK"
+          NUM_ROW="110"
+        >   	
+        <DEFAULT>false</DEFAULT>
+        </PARAMETER>
+        <PARAMETER
+	      NAME="RETENTION_MODE"
+	      FIELD="CLOSED_LIST"
+	      NUM_ROW="111"
+	      SHOW_IF="ENABLE_OBJECT_LOCK == 'true'"
+	    >
+	      <ITEMS DEFAULT="GOVERNANCE">
+	        <ITEM NAME="GOVERNANCE" VALUE="GOVERNANCE" />
+	        <ITEM NAME="COMPLIANCE" VALUE="COMPLIANCE" />
+	      </ITEMS>
+	    </PARAMETER>
+	    <PARAMETER
+	      NAME="RETENTION_PERIOD"
+	      FIELD="TEXT"
+	      NUM_ROW="111"
+	      REQUIRED="true"
+	      SHOW_IF="ENABLE_OBJECT_LOCK == 'true'"
+	    >
+	      <DEFAULT>1</DEFAULT>
+	    </PARAMETER>
+	    <PARAMETER
+	      NAME="RETENTION_PERIOD_TYPE"
+	      FIELD="CLOSED_LIST"
+	      NUM_ROW="111"
+	      SHOW_IF="ENABLE_OBJECT_LOCK == 'true'"
+	    >
+	      <ITEMS DEFAULT="DAYS">
+	        <ITEM NAME="DAYS" VALUE="DAYS" />
+	        <ITEM NAME="YEARS" VALUE="YEARS" />
+	      </ITEMS>
+	    </PARAMETER>
+        
     </ADVANCED_PARAMETERS>
 
    <CODEGENERATION>
@@ -582,6 +644,8 @@
 		<IMPORT NAME="commons-codec-1.14.jar" MODULE="commons-codec-1.14.jar"
 			MVN="mvn:commons-codec/commons-codec/1.14"
 			REQUIRED_IF="USE_EXISTING_CONNECTION == 'false'" />
+		<IMPORT NAME="jaxb-api-2.3.1" MODULE="jaxb-api-2.3.1.jar" 
+			MVN="mvn:javax.xml.bind/jaxb-api/2.3.1" REQUIRED_IF="ENABLE_OBJECT_LOCK == 'true'" />
     </IMPORTS>
    </CODEGENERATION>
 

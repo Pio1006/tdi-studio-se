@@ -35,8 +35,6 @@ import org.talend.commons.exception.PersistenceException;
 import org.talend.commons.ui.runtime.exception.ExceptionHandler;
 import org.talend.core.CorePlugin;
 import org.talend.core.GlobalServiceRegister;
-import org.talend.core.PluginChecker;
-import org.talend.core.model.components.IComponent;
 import org.talend.core.model.metadata.IMetadataColumn;
 import org.talend.core.model.metadata.IMetadataTable;
 import org.talend.core.model.process.EConnectionType;
@@ -53,12 +51,9 @@ import org.talend.core.model.properties.ConnectionItem;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.repository.IRepositoryViewObject;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
-import org.talend.core.ui.IJobletProviderService;
-import org.talend.core.ui.component.ComponentsFactoryProvider;
 import org.talend.core.ui.process.IGraphicalNode;
 import org.talend.designer.core.ITestContainerGEFService;
 import org.talend.designer.core.i18n.Messages;
-import org.talend.designer.core.model.components.DummyComponent;
 import org.talend.designer.core.model.components.EParameterName;
 import org.talend.designer.core.model.components.ElementParameter;
 import org.talend.designer.core.ui.AbstractMultiPageTalendEditor;
@@ -394,24 +389,8 @@ public class NodesPasteCommand extends Command {
             if (!containNodeInProcess(copiedNode)) {
                 continue;
             }
-            IComponent component = ComponentsFactoryProvider.getInstance().get(copiedNode.getComponent().getName(),
-                    process.getComponentsType());
-            if (component == null) {
-                boolean isJobletInOutComponent = false;
-                if (PluginChecker.isJobLetPluginLoaded()) {
-                    IJobletProviderService service = GlobalServiceRegister.getDefault()
-                            .getService(IJobletProviderService.class);
-                    if (service != null && service.isJobletInOutComponent(copiedNode)) {
-                        isJobletInOutComponent = true;
-                    }
-                }
-                if (isJobletInOutComponent) {
-                    component = copiedNode.getComponent();
-                } else {
-                    component = new DummyComponent(copiedNode.getComponent().getName());
-                }
-            }
-            IGraphicalNode pastedNode = new Node(component, process);
+
+            IGraphicalNode pastedNode = new Node(copiedNode, process);
             if (nodeMap != null) {
                 nodeMap.put(copiedNode, pastedNode);
             }

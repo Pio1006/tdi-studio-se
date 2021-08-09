@@ -25,7 +25,7 @@
 		<talendMQConnectionUtil.version>1.0.1-20190215</talendMQConnectionUtil.version>
 		<tldapinput.dir>${project.basedir}/components/tLDAPInput</tldapinput.dir>
 		<tproxy.dir>${project.basedir}/components/tSetProxy</tproxy.dir>
-		<tproxy.version>1.0.1</tproxy.version>
+		<tproxy.version>1.0.2</tproxy.version>
 	</properties>
 
 	<build>
@@ -113,7 +113,7 @@
 								<artifactItem>
 									<groupId>org.talend.components</groupId>
 									<artifactId>talend-ws</artifactId>
-									<version>1.0.4-20210429</version>
+									<version>1.0.5-20210629</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
 									<outputDirectory>${webservicecore.dir}</outputDirectory>

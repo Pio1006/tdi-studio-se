@@ -24,6 +24,7 @@ imports="
     String batchSize = ElementParameterParser.getValue(node,"__BATCH_SIZE__");
     String messageGroupId = ElementParameterParser.getValue(node,"__GROUP_ID__");
 	List<IMetadataTable> metadatas = node.getMetadataList();
+	List<? extends IConnection> connMains = node.getOutgoingConnections("MAIN");
 	if ((metadatas!=null)&&(metadatas.size()>0)) {
 		IMetadataTable metadata = metadatas.get(0);
 		List<IMetadataColumn> columns = metadata.getListColumns();
@@ -169,6 +170,25 @@ imports="
             			log.debug("<%=cid%> - MD5OfBody: " + sendMsgResult_<%=cid%>.getMD5OfMessageBody());
             			log.debug("<%=cid%> - Message End ");
 	<%
+					}
+				}
+				if (connMains != null && connMains.size() == 1) {
+					IConnection connMain = connMains.get(0);
+					if (connMain.getLineStyle().hasConnectionCategory(IConnectionCategory.DATA)) {
+						IMetadataTable outputTable = connMain.getMetadataTable();
+						%>
+						<%=connMain.getName() %> = new <%=connMain.getName() %>Struct();
+						<%
+						if(outputTable != null && outputTable.getColumn("MessageId")!=null){
+						%>
+							<%=connMain.getName() %>.MessageId = sendMsgResult_<%=cid%>.getMessageId();
+						<%
+						}
+						for (IMetadataColumn column: metadata.getListColumns()) {
+						%>
+    						<%=connMain.getName() %>.<%=column.getLabel() %> = <%=conn.getName() %>.<%=column.getLabel() %>;			
+						<%	
+						}
 					}
 				}
 			}

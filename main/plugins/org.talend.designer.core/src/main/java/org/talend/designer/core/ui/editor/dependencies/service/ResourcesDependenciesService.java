@@ -72,6 +72,11 @@ public class ResourcesDependenciesService implements IResourcesDependenciesServi
 
     @Override
     public String getResourcePathForContext(IProcess process, String resourceContextValue) {
+        return getResourcePathForContext(process, resourceContextValue, false);
+    }
+
+    @Override
+    public String getResourcePathForContext(IProcess process, String resourceContextValue, boolean forceRelative) {
         String resPath = null;
         if (process instanceof IProcess2) {
             IProcess2 process2 = (IProcess2) process;
@@ -92,7 +97,7 @@ public class ResourcesDependenciesService implements IResourcesDependenciesServi
                         JobResourceDependencyModel model = new JobResourceDependencyModel(
                                 (ResourceItem) repoObject.getProperty().getItem());
                         String jobLabel = JavaResourcesHelper.getJobFolderName(property.getLabel(), property.getVersion());
-                        if (ProcessorUtilities.isExportConfig()) {
+                        if (ProcessorUtilities.isExportConfig() || forceRelative) {
                             resPath = ResourceDependenciesUtil.getResourcePath(model, jobLabel, parts[1]);
                         }else {
                             resPath = ResourceDependenciesUtil.getJobExecuteResourceFilePath(model, property, jobLabel, parts[1]);

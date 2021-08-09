@@ -216,7 +216,7 @@ public class LoginProjectPage extends AbstractLoginActionPage {
 
     protected boolean hasUpdate = false;
 
-    protected IBrandingService brandingService = (IBrandingService) GlobalServiceRegister.getDefault().getService(
+    protected IBrandingService brandingService = GlobalServiceRegister.getDefault().getService(
             IBrandingService.class);
 
     protected LoginHelper loginHelper;
@@ -452,7 +452,16 @@ public class LoginProjectPage extends AbstractLoginActionPage {
                         if (monitor.isCanceled() || isDisposed()) {
                             return Status.CANCEL_STATUS;
                         }
-                        Display.getDefault().syncExec(() -> handleOpenConnectionsDialog(true));
+                        ConnectionBean selectedConnBean = loginHelper.getCurrentSelectedConnBean();
+                        if (selectedConnBean != null && selectedConnBean.isStoreCredentials()) {
+                            if (LoginHelper.isRestart) {
+                                LoginHelper.getInstance().getCredentials(selectedConnBean);
+                            } else {
+                                Display.getDefault().syncExec(() -> handleOpenConnectionsDialog(false));
+                            }
+                        } else {
+                            Display.getDefault().syncExec(() -> handleOpenConnectionsDialog(true));
+                        }
                     }
                 } catch (Exception e) {
                     CommonExceptionHandler.process(e);
@@ -856,7 +865,10 @@ public class LoginProjectPage extends AbstractLoginActionPage {
 
     protected boolean isNeedSandboxProject() {
         isNeedSandboxProject = false;
-        if (LoginHelper.isRemotesConnection(getConnection())) {
+        ConnectionBean connBean = getConnection();
+        boolean isStoreCredentials = connBean != null && connBean.isStoreCredentials()
+                && StringUtils.isBlank(connBean.getCredentials());
+        if (LoginHelper.isRemotesConnection(getConnection()) && !isStoreCredentials) {
             try {
                 isNeedSandboxProject = ProxyRepositoryFactory.getInstance().enableSandboxProject();
             } catch (Exception e) {
@@ -1450,7 +1462,7 @@ public class LoginProjectPage extends AbstractLoginActionPage {
         // install and update all patches;
         try {
             if (FINISH_ACTION_UPDATE.equals(finishButtonAction)) {
-                ICoreTisService tisService = (ICoreTisService) GlobalServiceRegister.getDefault().getService(
+                ICoreTisService tisService = GlobalServiceRegister.getDefault().getService(
                         ICoreTisService.class);
                 afterUpdate = false;
                 if (tisService != null) {
@@ -1850,7 +1862,7 @@ public class LoginProjectPage extends AbstractLoginActionPage {
                     });
                 } else {
                     if (!SharedStudioUtils.isSharedStudioMode()) {
-                        hasUpdate = LoginHelper.isStudioNeedUpdate(currentBean);
+                        hasUpdate = !currentBean.isStoreCredentials() && LoginHelper.isStudioNeedUpdate(currentBean);
                         if (monitor.isCanceled()) {
                             return;
                         }
@@ -1973,7 +1985,7 @@ public class LoginProjectPage extends AbstractLoginActionPage {
         } else if (valid && !isRemote && !Pattern.matches(RepositoryConstants.MAIL_PATTERN, getUser().getLogin())) {
             valid = false;
         }
-        if (valid && !serverIsLocal && connection.getPassword().length() == 0) {
+        if (valid && !serverIsLocal && (!connection.isStoreCredentials() && connection.getPassword().length() == 0)) {
             valid = false;
         }
 
@@ -2235,7 +2247,9 @@ public class LoginProjectPage extends AbstractLoginActionPage {
     }
     
     private List<String> getPopularBranches(List<String> brancheNames, String defaultBranch){
-        if (brancheNames == null) return null;
+        if (brancheNames == null) {
+            return null;
+        }
         final int maxSize = 10;
         List<String> popularBranches = new LinkedList<>();
         String storage = null;
@@ -2302,7 +2316,9 @@ public class LoginProjectPage extends AbstractLoginActionPage {
     }
     
     private String getLastLogonBranch(Project project) {
-        if (project == null) return null;
+        if (project == null) {
+            return null;
+        }
         String lastLogonBranch = null;
         try {
             String jsonStr = project.getEmfProject().getUrl();
@@ -2627,6 +2643,8 @@ public class LoginProjectPage extends AbstractLoginActionPage {
                 connectionName = connectionName + " (" + Messages.getString("LoginProjectPage.cloud.aws_apac"); //$NON-NLS-1$//$NON-NLS-2$
             } else if (LoginHelper.isCloudUSWestConnection(prj)) {
                 connectionName = connectionName + " (" + Messages.getString("LoginProjectPage.cloud.usa_west"); //$NON-NLS-1$//$NON-NLS-2$
+            }else if (LoginHelper.isCloudAUSConnection(prj)) {
+                connectionName = connectionName + " (" + Messages.getString("LoginProjectPage.cloud.aws_aus"); //$NON-NLS-1$//$NON-NLS-2$
             } else if (LoginHelper.isCloudCustomConnection(prj)) {
                 connectionName = connectionName + " (" + Messages.getString("LoginProjectPage.cloud.cloud_custom"); //$NON-NLS-1$//$NON-NLS-2$
             } else {

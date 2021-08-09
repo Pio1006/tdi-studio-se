@@ -151,6 +151,7 @@ import org.talend.designer.joblet.model.JobletNode;
 import org.talend.designer.joblet.model.JobletProcess;
 import org.talend.designer.runprocess.IRunProcessService;
 import org.talend.designer.runprocess.ItemCacheManager;
+import org.talend.designer.runprocess.ProcessorUtilities;
 import org.talend.repository.RepositoryPlugin;
 import org.talend.repository.model.IProxyRepositoryFactory;
 import org.talend.repository.utils.AutoConvertTypesUtils;
@@ -509,11 +510,12 @@ public class Node extends Element implements IGraphicalNode {
         this.oldcomponent = oldNode.getComponent();
         this.delegateComponent = UnifiedComponentUtil.getDelegateComponent(oldNode.getComponent());
         this.process = process;
-        init(oldNode.getComponent());
+        this.component = UnifiedComponentUtil.getEmfComponent(this, oldNode.getComponent());
         if (component != null && component instanceof AbstractBasicComponent) {
             AbstractBasicComponent comp = (AbstractBasicComponent) component;
             comp.initNodeProperties(this, oldNode);
         }
+        init();
         needlibrary = false;
     }
 
@@ -524,6 +526,10 @@ public class Node extends Element implements IGraphicalNode {
 
     private void init(IComponent newComponent) {
         this.component = UnifiedComponentUtil.getEmfComponent(this, newComponent);
+        init();
+    }
+
+    private void init() {
         this.label = component.getDisplayName();
         updateComponentStatusIfNeeded(true);
         IPreferenceStore store = DesignerPlugin.getDefault().getPreferenceStore();
@@ -3036,6 +3042,8 @@ public class Node extends Element implements IGraphicalNode {
             checktAggregateRow(param);
 
             checkDynamicJobUsage(param);
+            
+            checkTRunjobProcessVersion(param);
         }
 
         checkJobletConnections();
@@ -4580,6 +4588,60 @@ public class Node extends Element implements IGraphicalNode {
     }
     
 
+    /**
+     * DOC zyuan Comment method "checkTRunjobProcessVersion".  
+     * Show error on tRunjob same as joblet if the referred old version do not exist anymore.
+     */
+    private void checkTRunjobProcessVersion(IElementParameter param) {
+        if (getComponent() != null && "tRunJob".equals(getComponent().getName()) 
+                && EParameterName.PROCESS_TYPE_VERSION.getName().equals(param.getName())) {
+            String version = (String) param.getValue();
+            if (StringUtils.isBlank(version) || version.equals(ItemCacheManager.LATEST_VERSION)) return;
+            boolean found = false;
+            if (param.getListItemsValue().length > 1) {
+                //if the items value has been set besides 'Latest'
+                for (int i = 0; i < param.getListItemsValue().length && !found; i++) {
+                    if (param.getListItemsValue()[i].equals(version)) {
+                        found = true;
+                    }
+                }
+            } else {
+                IElementParameter thisElement = this.getElementParameter(EParameterName.PROCESS.getName());
+                // at first, when create a new tRunJob, this process is empty,it will have value after second call
+                if ( thisElement == null || StringUtils.isBlank(thisElement.getValue().toString())) {
+                    return;
+                }
+                
+                Map<String, IElementParameter> childParameters = thisElement.getChildParameters();
+                IElementParameter jobNameParam = childParameters.get(EParameterName.PROCESS_TYPE_PROCESS.getName());
+                if (jobNameParam == null) return;
+                
+                final String strJobId = (String) jobNameParam.getValue();
+                String[] strJobIds = strJobId.split(";");
+                for (int i = 0; i < strJobIds.length && !found; i++) {
+                    String id = strJobIds[i];
+                    if (StringUtils.isNotEmpty(id)) {
+                        List<IRepositoryViewObject> allVersion = ProcessorUtilities.getAllVersionObjectById(id);
+                        if (allVersion != null) {
+                            for (IRepositoryViewObject obj : allVersion) {
+                                if (version.equals(obj.getVersion())) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            boolean isContextValue = ContextParameterUtils
+                    .isContainContextParam(String.valueOf(param.getValue()));
+            if (!found && !isContextValue) {
+                String errorMessage = Messages.getString("Node.parameterNotExist", param.getDisplayName(), version); //$NON-NLS-1$
+                Problems.add(ProblemStatus.ERROR, this, errorMessage);
+            }
+        }
+    }
+    
     /**
      * DOC xye Comment method "checkParallelizeStates".
      */

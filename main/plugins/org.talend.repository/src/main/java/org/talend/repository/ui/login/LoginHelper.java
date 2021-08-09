@@ -22,8 +22,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
@@ -32,6 +34,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -124,12 +127,14 @@ public class LoginHelper {
 
     public static boolean isAutoLogonFailed;
 
-    private IBrandingService brandingService = (IBrandingService) GlobalServiceRegister.getDefault().getService(
+    private IBrandingService brandingService = GlobalServiceRegister.getDefault().getService(
             IBrandingService.class);
 
     private IGITProviderService gitProviderService;
 
     private Map<String, String> licenseMap;
+
+    private List<ConnectionBean> currentConnections = null;
 
     public static LoginHelper getInstance() {
         if (instance == null) {
@@ -153,9 +158,9 @@ public class LoginHelper {
     protected void init() {
         if (PluginChecker.isSVNProviderPluginLoaded()) {
             try {
-                svnProviderService = (ISVNProviderService) GlobalServiceRegister.getDefault().getService(
+                svnProviderService = GlobalServiceRegister.getDefault().getService(
                         ISVNProviderService.class);
-                gitProviderService = (IGITProviderService) GlobalServiceRegister.getDefault().getService(
+                gitProviderService = GlobalServiceRegister.getDefault().getService(
                         IGITProviderService.class);
             } catch (RuntimeException e) {
                 // nothing to do
@@ -253,7 +258,7 @@ public class LoginHelper {
         }
         return isCloudUSConnection(connectionBean) || isCloudUSWestConnection(connectionBean)
                 || isCloudEUConnection(connectionBean) || isCloudAPACConnection(connectionBean)
-                || isCloudCustomConnection(connectionBean);
+                || isCloudCustomConnection(connectionBean)|| isCloudAUSConnection(connectionBean);
     }
 
     public static boolean isCloudUSConnection(ConnectionBean connectionBean) {
@@ -283,6 +288,13 @@ public class LoginHelper {
         }
         return RepositoryConstants.REPOSITORY_CLOUD_US_WEST_ID.equals(connectionBean.getRepositoryId());
     }
+    
+    public static boolean isCloudAUSConnection(ConnectionBean connectionBean) {
+        if (connectionBean == null) {
+            return false;
+        }
+        return RepositoryConstants.REPOSITORY_CLOUD_AUS_ID.equals(connectionBean.getRepositoryId());
+    }
 
     public static boolean isCloudCustomConnection(ConnectionBean connectionBean) {
         if (connectionBean == null) {
@@ -293,7 +305,7 @@ public class LoginHelper {
 
     public static boolean isCloudRepository(String repositoryId) {
         return isCloudUSRepository(repositoryId) || isCloudEURepository(repositoryId) || isCloudAPACRepository(repositoryId)
-                || isCloudCustomRepository(repositoryId) || isCloudUSWestRepository(repositoryId);
+                || isCloudCustomRepository(repositoryId) || isCloudUSWestRepository(repositoryId)||isCloudAUSRepository(repositoryId);
     }
 
     public static boolean isCloudUSRepository(String repositoryId) {
@@ -312,6 +324,10 @@ public class LoginHelper {
         return RepositoryConstants.REPOSITORY_CLOUD_US_WEST_ID.equals(repositoryId);
     }
 
+    public static boolean isCloudAUSRepository(String repositoryId) {
+        return RepositoryConstants.REPOSITORY_CLOUD_AUS_ID.equals(repositoryId);
+    }
+    
     public static boolean isCloudCustomRepository(String repositoryId) {
         return RepositoryConstants.REPOSITORY_CLOUD_CUSTOM_ID.equals(repositoryId);
     }
@@ -321,6 +337,8 @@ public class LoginHelper {
     }
 
     public void saveConnections(List<ConnectionBean> connectionsBeans) {
+        currentConnections = new ArrayList<ConnectionBean>();
+        currentConnections.addAll(connectionsBeans);
         perReader.saveConnections(connectionsBeans);
         if (connectionsBeans != storedConnections) {
             setStoredConnections(connectionsBeans);
@@ -340,11 +358,25 @@ public class LoginHelper {
         if (currentSelectedConnBean == null) {
             currentSelectedConnBean = firstConnBean;
         }
+        if (currentSelectedConnBean != null && currentSelectedConnBean.isStoreCredentials()) {
+            ConnectionBean currentConnection = getConnectionBeanByName(this.currentConnections,
+                    currentSelectedConnBean.getName());
+            if (currentConnection != null) {
+                currentSelectedConnBean.setCredentials(currentConnection.getCredentials());
+            }
+        }
         return currentSelectedConnBean;
     }
 
     public void setCurrentSelectedConnBean(ConnectionBean connBean) {
+        String oldCredentials = null;
+        if (this.currentSelectedConnBean != null) {
+            oldCredentials = this.currentSelectedConnBean.getCredentials();
+        }
         this.currentSelectedConnBean = connBean;
+        if (StringUtils.isNoneBlank(oldCredentials) && connBean.isStoreCredentials()) {
+            this.currentSelectedConnBean.setCredentials(oldCredentials);
+        }
     }
 
     protected static ConnectionBean getConnection() {
@@ -395,7 +427,7 @@ public class LoginHelper {
     }
 
     public static boolean isStudioNeedUpdate(ConnectionBean connBean) throws SystemException {
-        ICoreTisService tisService = (ICoreTisService) GlobalServiceRegister.getDefault().getService(ICoreTisService.class);
+        ICoreTisService tisService = GlobalServiceRegister.getDefault().getService(ICoreTisService.class);
         if (tisService != null) {
             return tisService.needUpdate(connBean.getUser(), connBean.getPassword(), getAdminURL(connBean));
         } else {
@@ -467,7 +499,7 @@ public class LoginHelper {
                  * Auto login, means there should be local repository
                  */
                 branches = getProjectBranches(lastUsedProject, true);
-            } catch (JSONException e) {
+            } catch (JSONException e) {                         
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -524,7 +556,7 @@ public class LoginHelper {
 
         try {
             if (GlobalServiceRegister.getDefault().isServiceRegistered(ICoreTisService.class)) {
-                final ICoreTisService service = (ICoreTisService) GlobalServiceRegister.getDefault()
+                final ICoreTisService service = GlobalServiceRegister.getDefault()
                         .getService(ICoreTisService.class);
                 if (service != null) {// if in TIS then update the bundle status according to the project type
                     if (!service.validProject(project, needRestartForLocal)) {
@@ -826,7 +858,7 @@ public class LoginHelper {
      * @throws JSONException
      */
     public List<String> getProjectBranches(Project p, boolean onlyLocalIfPossible) throws JSONException {
-        IRepositoryService repositoryService = (IRepositoryService) GlobalServiceRegister.getDefault()
+        IRepositoryService repositoryService = GlobalServiceRegister.getDefault()
                 .getService(IRepositoryService.class);
         if (repositoryService != null) {
             return repositoryService.getProjectBranch(p, onlyLocalIfPossible);
@@ -1021,4 +1053,27 @@ public class LoginHelper {
         this.prefManipulator = prefManipulator;
     }
 
+    public List<ConnectionBean> getCurrentConnections() {
+        return this.currentConnections;
+    }
+
+    public void setCurrentConnections(List<ConnectionBean> currentConnections) {
+        this.currentConnections = currentConnections;
+    }
+    
+    public ConnectionBean getCredentials(ConnectionBean selectedConnBean) {
+        final AtomicReference<ConnectionBean> aRef = new AtomicReference<>(null);
+        Display.getDefault().syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                Shell shell = DisplayUtils.getDefaultShell();
+                StoreCredentialDialog dialog = new StoreCredentialDialog(shell, selectedConnBean);
+                if (dialog.open() == Window.OK) {
+                    aRef.set(dialog.getSelectedConnBean());
+                }
+            }
+        });
+        return aRef.get();
+    }
 }

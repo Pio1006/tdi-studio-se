@@ -15,13 +15,12 @@
  */
 package org.talend.sdk.component.studio.model.parameter;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,23 +39,23 @@ class ValueConverterTest {
 
         String table = "[{key1=value11, key2=value12}, {key1=value21, key2=value22}]";
         List<Map<String, Object>> converted = ValueConverter.toTable(table);
-        assertEquals(2, converted.size());
-        assertEquals(expected0, converted.get(0));
-        assertEquals(expected1, converted.get(1));
+        Assertions.assertEquals(2, converted.size());
+        Assertions.assertEquals(expected0, converted.get(0));
+        Assertions.assertEquals(expected1, converted.get(1));
     }
 
     @Test
     void testToTableNull() {
         ArrayList<Map<String, Object>> empty = new ArrayList<>();
         List<Map<String, Object>> actual = ValueConverter.toTable(null);
-        assertEquals(empty, actual);
+        Assertions.assertEquals(empty, actual);
     }
 
     @Test
     void testToTableEmpty() {
         ArrayList<Map<String, Object>> empty = new ArrayList<>();
         List<Map<String, Object>> actual = ValueConverter.toTable("");
-        assertEquals(empty, actual);
+        Assertions.assertEquals(empty, actual);
     }
 
 }

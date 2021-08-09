@@ -278,11 +278,21 @@ public class TalendBorderItemRectilinearRouter extends BorderItemRectilinearRout
         Point lastPoint = conn.getPoints().getLastPoint();
         PointList pointList = new PointList();
         pointList.addPoint(firstPoint);
-        pointList.addPoint((lastPoint.x + firstPoint.x) / 2, firstPoint.y);
+        if (Math.abs(firstPoint.x - lastPoint.x) >= OFFSET * 4) {
 
-        pointList.addPoint((lastPoint.x + firstPoint.x) / 2, (lastPoint.y + firstPoint.y) / 2);
+            pointList.addPoint((lastPoint.x + firstPoint.x) / 2, firstPoint.y);
 
-        pointList.addPoint((lastPoint.x + firstPoint.x) / 2, lastPoint.y);
+            pointList.addPoint((lastPoint.x + firstPoint.x) / 2, (lastPoint.y + firstPoint.y) / 2);
+
+            pointList.addPoint((lastPoint.x + firstPoint.x) / 2, lastPoint.y);
+
+        } else {
+            pointList.addPoint(firstPoint.x, (lastPoint.y + firstPoint.y) / 2);
+
+            pointList.addPoint((lastPoint.x + firstPoint.x) / 2, (lastPoint.y + firstPoint.y) / 2);
+
+            pointList.addPoint(lastPoint.x, (lastPoint.y + firstPoint.y) / 2);
+        }
         pointList.addPoint(lastPoint);
 
         conn.setPoints(pointList);

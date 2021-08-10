@@ -67,6 +67,7 @@
 				if(isAmazonAurora){
 				    conn += "_in";
                 }
+
 				%>
 				conn_<%=cid%> = (java.sql.Connection)globalMap.get("<%=conn%>");
 			<%

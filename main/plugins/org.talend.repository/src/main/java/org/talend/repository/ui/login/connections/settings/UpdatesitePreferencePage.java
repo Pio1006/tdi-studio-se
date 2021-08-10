@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Text;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.core.service.IStudioLiteP2Service;
 import org.talend.core.service.IStudioLiteP2Service.UpdateSiteConfig;
+import org.talend.repository.i18n.Messages;
 
 /**
  * DOC cmeng class global comment. Detailled comment
@@ -65,7 +66,7 @@ public class UpdatesitePreferencePage extends PreferencePage {
         composite.setLayout(compLayout);
 
         Label releaseLabel = new Label(composite, SWT.NONE);
-        releaseLabel.setText("Release Url");
+        releaseLabel.setText(Messages.getString("UpdatesitePreferencePage.releaseUrl"));
         GridData gd = new GridData(SWT.LEFT, SWT.CENTER, false, false);
         releaseLabel.setLayoutData(gd);
 
@@ -74,7 +75,7 @@ public class UpdatesitePreferencePage extends PreferencePage {
         releaseUriText.setLayoutData(gd);
 
         Label updateLabel = new Label(composite, SWT.NONE);
-        updateLabel.setText("Update Url");
+        updateLabel.setText(Messages.getString("UpdatesitePreferencePage.updateUrl"));
         gd = new GridData(SWT.LEFT, SWT.CENTER, false, false);
         updateLabel.setLayoutData(gd);
 
@@ -93,6 +94,10 @@ public class UpdatesitePreferencePage extends PreferencePage {
             UpdateSiteConfig config = p2Service.getUpdateSiteConfig(new NullProgressMonitor());
             URI release = config.getRelease(monitor);
             releaseUriText.setText(release == null ? "" : release.toString());
+            releaseUriText.setEditable(config.isReleaseEditable());
+            if (!config.isReleaseEditable()) {
+                releaseUriText.setToolTipText(Messages.getString("UpdatesitePreferencePage.tooltip.cantEdit"));
+            }
             Collection<URI> updates = config.getUpdates(monitor);
             StringBuilder updateStr = new StringBuilder();
             if (updates != null && !updates.isEmpty()) {
@@ -104,6 +109,10 @@ public class UpdatesitePreferencePage extends PreferencePage {
                 }
             }
             updateUriText.setText(updateStr.toString());
+            updateUriText.setEditable(config.isUpdateEditable());
+            if (!config.isUpdateEditable()) {
+                updateUriText.setToolTipText(Messages.getString("UpdatesitePreferencePage.tooltip.cantEdit"));
+            }
         } catch (Exception e) {
             ExceptionHandler.process(e);
         }
@@ -132,18 +141,22 @@ public class UpdatesitePreferencePage extends PreferencePage {
             try {
                 IProgressMonitor monitor = new NullProgressMonitor();
                 UpdateSiteConfig config = p2Service.getUpdateSiteConfig(new NullProgressMonitor());
-                String release = releaseUriText.getText();
-                config.setRelease(monitor, StringUtils.isBlank(release) ? null : new URI(release.trim()));
-                String update = updateUriText.getText();
-                if (StringUtils.isBlank(update)) {
-                    config.setUpdates(monitor, null);
-                } else {
-                    Collection<URI> updates = new ArrayList<>();
-                    String[] splits = update.split(",");
-                    for (String split : splits) {
-                        updates.add(new URI(split.trim()));
+                if (config.isReleaseEditable()) {
+                    String release = releaseUriText.getText();
+                    config.setRelease(monitor, StringUtils.isBlank(release) ? null : new URI(release.trim()));
+                }
+                if (config.isUpdateEditable()) {
+                    String update = updateUriText.getText();
+                    if (StringUtils.isBlank(update)) {
+                        config.setUpdates(monitor, null);
+                    } else {
+                        Collection<URI> updates = new ArrayList<>();
+                        String[] splits = update.split(",");
+                        for (String split : splits) {
+                            updates.add(new URI(split.trim()));
+                        }
+                        config.setUpdates(monitor, updates);
                     }
-                    config.setUpdates(monitor, updates);
                 }
             } catch (Exception e) {
                 ExceptionHandler.process(e);
@@ -169,7 +182,7 @@ public class UpdatesitePreferencePage extends PreferencePage {
         this.setErrorMessage(null);
         if (StringUtils.equals(releaseUriText.getText().trim(), updateUriText.getText().trim())
                 && StringUtils.isNotBlank(releaseUriText.getText())) {
-            this.setErrorMessage("Release and Update should be different");
+            this.setErrorMessage(Messages.getString("UpdatesitePreferencePage.err.releaseAndUpdateShouldBeDiff"));
             return false;
         } else {
             return true;

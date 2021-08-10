@@ -3486,15 +3486,6 @@
                name="TeradataTPTAddDatabaseNameToOptionalTablesMigrationTask"
                version="7.3.1">
        </projecttask>
-       <projecttask
-          beforeLogon="true"
-          breaks="7.3.0"
-          class="org.talend.repository.model.migration.UpdateDaikonCryptoUtilsMigrationTask"
-          id="org.talend.repository.model.migration.UpdateDaikonCryptoUtilsMigrationTask"
-          description="Update Daikon Crypto Utils"
-          name="UpdateDaikonCryptoUtilsMigrationTask"
-          version="7.3.1">
-       </projecttask>
 	   <projecttask
                beforeLogon="false"
                breaks="7.3.0"
@@ -3692,6 +3683,15 @@
                name="UncheckBson2JsonTask"
                version="7.3.1">
        </projecttask>
+        <projecttask
+              beforeLogon="false"
+              breaks="7.3.0"
+              class="org.talend.repository.model.migration.RenameConnectionName4tSQSOutput"
+              description="Rename connection name of tSQSOutput"
+              id="org.talend.repository.model.migration.RenameConnectionName4tSQSOutput"
+              name="RenameConnectionName4tSQSOutput"
+              version="7.3.1">
+        </projecttask>
    </extension>
 
    <extension
@@ -3895,9 +3895,27 @@
       </page>
       <page
             category="general"
+            class="org.talend.repository.preference.VersionManagementDefaultPage"
+            description="%projectsetting.VersionManagementDesc"
+            id="projectsetting.VersionManagement"
+            title="%projectsetting.VersionManagement">
+      </page>
+      <page
+            category="projectsetting.VersionManagement"
             class="org.talend.repository.preference.VersionManagementPage"
             id="org.talend.repository.preference.VersionManagementPage"
-            title="%projectsetting.VersionManagement">
+            order="0"
+            title="%projectsetting.VersionManagementUpgrade">
+         <tester
+               class="org.talend.repository.preference.VersionManagementProjectSettingPageTester">
+         </tester>
+      </page>
+      <page
+            category="projectsetting.VersionManagement"
+            class="org.talend.repository.preference.VersionManagementRemovePage"
+            id="org.talend.repository.preference.VersionManagementRemovePage"
+            order="1"
+            title="%projectsetting.VersionManagementCleanup">
          <tester
                class="org.talend.repository.preference.VersionManagementProjectSettingPageTester">
          </tester>

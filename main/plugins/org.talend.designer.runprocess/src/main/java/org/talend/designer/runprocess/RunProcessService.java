@@ -37,6 +37,7 @@ import org.talend.core.model.process.JobInfo;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.properties.Property;
 import org.talend.core.model.repository.ERepositoryObjectType;
+import org.talend.core.model.repository.IRepositoryViewObject;
 import org.talend.core.model.routines.CodesJarInfo;
 import org.talend.core.runtime.process.ITalendProcessJavaProject;
 import org.talend.core.runtime.projectsetting.ProjectPreferenceManager;
@@ -549,6 +550,17 @@ public class RunProcessService implements IRunProcessService {
     public void deleteTalendCodesJarProject(ERepositoryObjectType type, String projectTechName, String codesJarName,
             boolean deleteContent) {
         delegateService.deleteTalendCodesJarProject(type, projectTechName, codesJarName, deleteContent);
+    }
+
+    @Override
+    public void deleteOldVersionTalendJobProject(IRepositoryViewObject object) {
+        // TODO Auto-generated method stub
+        delegateService.deleteOldVersionTalendJobProject(object);
+    }
+
+    @Override
+    public void checkAndUpdateDaikonDependencies() {
+        delegateService.checkAndUpdateDaikonDependencies();
     }
 
 }

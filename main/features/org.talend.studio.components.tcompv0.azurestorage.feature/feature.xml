@@ -16,6 +16,10 @@
       [Enter License Description here.]
    </license>
 
+   <requires>
+      <import plugin="org.talend.designer.maven.repo.tcompv0" version="0.0.0" match="greaterOrEqual"/>
+   </requires>
+
    <plugin
          id="org.talend.studio.components.tcompv0.azurestorage"
          download-size="0"

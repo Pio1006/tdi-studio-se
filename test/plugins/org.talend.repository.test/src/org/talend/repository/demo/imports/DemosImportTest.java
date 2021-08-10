@@ -79,7 +79,7 @@ public abstract class DemosImportTest {
 
 	protected DemoProjectBean currentDemo;
 
-	protected IPath processItemPath, connectionItemPath, routineItemPath, contextItemPath, bussniessProcessPath,
+    protected IPath processItemPath, connectionItemPath, routineItemPath, contextItemPath,
 			sqlPatternPath, documentionPath, processMrPath, tdqProfilingAnaPath, tdqProfilingRepPath,
 			tdqLibrariesRuleSqlPath, tdqLibrariesPatternPath, routesItemPath, routeResourcePath, servicesItemPath,
 			mdmDatacontainerPath, mdmDataModelath, mdmResourcePath, mdmRolePath, mdmRoutingrulePath,
@@ -160,7 +160,6 @@ public abstract class DemosImportTest {
 		connectionItemPath = new Path("/metadata/"); //$NON-NLS-1$
 		routineItemPath = new Path("/code/");
 		contextItemPath = new Path("/context/");
-		bussniessProcessPath = new Path("/businessProcess/");
 		sqlPatternPath = new Path("/sqlPatterns/");
 		documentionPath = new Path("/documentations/");
 		processMrPath = new Path("/process_mr/");

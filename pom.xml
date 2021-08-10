@@ -33,14 +33,10 @@
 	</repositories>
 	<modules>
 		<module>main/features/org.talend.designer.feature</module>
-		<module>main/features/org.talend.gmf.feature</module>
-		<module>main/features/org.talend.designer.business.feature</module>
         <module>main/features/org.talend.fragment.jars.di.feature</module>
 		<module>main/features/org.talend.rcp.branding.tos.feature</module>
 		<module>main/features/org.talend.rcp.branding.tos.test.feature</module>
 		<module>main/features/org.talend.repository.feature</module>
-		<module>main/features/org.talend.sbi.feature</module>
-		<module>main/features/org.talend.spagic.feature</module>
 		<module>main/features/org.talend.tos.core.feature</module>
 		<module>main/features/org.talend.tos.feature</module>
 		<module>main/features/org.talend.tos.components.feature</module>
@@ -49,7 +45,6 @@
 		<module>main/plugins/org.talend.repository.generic</module>
 		<module>main/plugins/org.talend.designer.abstractmap</module>
 		<module>main/plugins/org.talend.designer.alfrescooutput</module>
-		<module>main/plugins/org.talend.designer.business.diagram</module>
 		<module>main/plugins/org.talend.designer.codegen</module>
 		<module>main/plugins/org.talend.designer.components.exchange</module>
 		<module>main/plugins/org.talend.designer.components.libs</module>
@@ -103,8 +98,6 @@
 		<module>main/plugins/org.talend.libraries.json</module>
 		<module>main/plugins/org.talend.repository.json</module>
 		<module>main/plugins/org.talend.repository.view.di</module>
-		<module>main/plugins/org.talend.sbi.engines.client</module>
-		<module>main/plugins/org.talend.spagic.engines.client</module>
 		<module>main/plugins/org.talend.libraries.sqlbuilder</module>
 		<module>main/plugins/org.talend.libraries.sqlbuilder.jars</module>
 		<module>main/plugins/org.talend.sqlbuilder</module>

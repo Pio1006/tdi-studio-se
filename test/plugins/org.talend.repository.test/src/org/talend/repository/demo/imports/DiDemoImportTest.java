@@ -90,14 +90,6 @@ public class DiDemoImportTest extends DemosImportTest {
 		// test the routine items under DI_Demo.zip
 		doRoutinesItemsTest(rootPath);
 
-		// test the business process items under DI_Demo.zip
-		int currentBusinessItemsSize = ProxyRepositoryFactory.getInstance()
-				.getAll(ERepositoryObjectType.BUSINESS_PROCESS).size();
-		List<File> demoBusinessItemsFiles = getDemoItemFileList(rootPath + File.separator + bussniessProcessPath);
-		Assert.assertTrue(demoBusinessItemsFiles.size() > 0);
-		Assert.assertTrue(currentBusinessItemsSize > 0);
-		Assert.assertEquals(demoBusinessItemsFiles.size(), currentBusinessItemsSize);
-
 		// test the documention items under DI_Demo.zip
 		int currentDocItemsSize = ProxyRepositoryFactory.getInstance().getAll(ERepositoryObjectType.DOCUMENTATION)
 				.size();
@@ -112,7 +104,6 @@ public class DiDemoImportTest extends DemosImportTest {
 		map.put(rootPath + File.separator + processItemPath, FileConstants.ITEM_EXTENSION);
 		map.put(rootPath + File.separator + contextItemPath, FileConstants.ITEM_EXTENSION);
 		map.put(rootPath + File.separator + connectionItemPath, FileConstants.ITEM_EXTENSION);
-		map.put(rootPath + File.separator + bussniessProcessPath, FileConstants.ITEM_EXTENSION);
 		map.put(rootPath + File.separator + documentionPath, FileConstants.ITEM_EXTENSION);
 		return map;
 	}

@@ -1,0 +1,330 @@
+<COMPONENT>
+    <HEADER
+            PLATEFORM="ALL"
+            SERIAL=""
+            VERSION="0.102"
+            STATUS="ALPHA"
+            COMPATIBILITY="ALL"
+            AUTHOR="Talend"
+            RELEASE_DATE="20070314A"
+            STARTABLE="true"
+            DATA_AUTO_PROPAGATE="false"
+            HAS_CONDITIONAL_OUTPUTS="true"
+            SCHEMA_AUTO_PROPAGATE="false"
+            PARTITIONING="AUTO"
+            LOG4J_ENABLED="true"
+    >
+        <SIGNATURE/>
+    </HEADER>
+
+    <FAMILIES>
+        <FAMILY>Databases/DB Specifics/Amazon/Aurora</FAMILY>
+        <FAMILY>Cloud/Amazon/Aurora</FAMILY>
+    </FAMILIES>
+
+    <DOCUMENTATION>
+        <URL/>
+    </DOCUMENTATION>
+
+    <CONNECTORS>
+        <CONNECTOR CTYPE="FLOW" MAX_INPUT="1" MAX_OUTPUT="1"/>
+        <CONNECTOR NAME="REJECT" NOT_SHOW_IF="(DIE_ON_ERROR == 'true')" CTYPE="FLOW" MAX_INPUT="0" MAX_OUTPUT="1"
+                   LINE_STYLE="2" COLOR="FF0000" BASE_SCHEMA="FLOW"/>
+        <CONNECTOR CTYPE="ITERATE" MAX_OUTPUT="1" MAX_INPUT="1"/>
+        <CONNECTOR CTYPE="SUBJOB_OK" MAX_INPUT="1"/>
+        <CONNECTOR CTYPE="SUBJOB_ERROR" MAX_INPUT="1"/>
+        <CONNECTOR CTYPE="COMPONENT_OK"/>
+        <CONNECTOR CTYPE="COMPONENT_ERROR"/>
+        <CONNECTOR CTYPE="RUN_IF"/>
+    </CONNECTORS>
+
+    <PARAMETERS>
+        <PARAMETER
+                NAME="PROPERTY"
+                FIELD="PROPERTY_TYPE"
+                NUM_ROW="1"
+                REPOSITORY_VALUE="DATABASE:AMAZON_AURORA"
+                SHOW_IF="USE_EXISTING_CONNECTION == 'false'"
+        />
+
+        <PARAMETER
+                NAME="DB_VERSION"
+                FIELD="CLOSED_LIST"
+                NUM_ROW="10"
+                REPOSITORY_VALUE="DB_VERSION"
+                READONLY="true"
+                SHOW_IF="USE_EXISTING_CONNECTION == 'false'"
+                SHOW="false">
+            <ITEMS DEFAULT="MYSQL_5">
+                <ITEM NAME="MYSQL_5" VALUE="MYSQL_5"/>
+            </ITEMS>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="USE_EXISTING_CONNECTION"
+                FIELD="CHECK"
+                NUM_ROW="20"
+        >
+            <DEFAULT>false</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="CONNECTION"
+                FIELD="COMPONENT_LIST"
+                FILTER="tAmazonAuroraConnection"
+                REQUIRED="true"
+                NUM_ROW="20"
+                SHOW_IF="USE_EXISTING_CONNECTION == 'true'"
+                DYNAMIC_SETTINGS="true"
+        />
+
+        <PARAMETER
+                NAME="HOST"
+                FIELD="TEXT"
+                NUM_ROW="30"
+                REPOSITORY_VALUE="SERVER_NAME"
+                REQUIRED="true"
+                SHOW_IF="USE_EXISTING_CONNECTION == 'false'"
+        >
+            <DEFAULT>""</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="PORT"
+                FIELD="TEXT"
+                NUM_ROW="30"
+                REPOSITORY_VALUE="PORT"
+                REQUIRED="true"
+                SHOW_IF="USE_EXISTING_CONNECTION == 'false'"
+        >
+            <DEFAULT>"3306"</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="DBNAME"
+                FIELD="TEXT"
+                NUM_ROW="40"
+                REPOSITORY_VALUE="SID"
+                REQUIRED="true"
+                SHOW_IF="USE_EXISTING_CONNECTION == 'false'"
+        >
+            <DEFAULT>""</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="TYPE"
+                FIELD="TEXT"
+                NUM_ROW="40"
+                SHOW="false"
+                REPOSITORY_VALUE="TYPE"
+        >
+            <DEFAULT>AMAZON_AURORA</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="USER"
+                FIELD="TEXT"
+                NUM_ROW="50"
+                REPOSITORY_VALUE="USERNAME"
+                REQUIRED="true"
+                SHOW_IF="USE_EXISTING_CONNECTION == 'false'"
+        >
+            <DEFAULT>""</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="PASS"
+                FIELD="PASSWORD"
+                NUM_ROW="50"
+                REPOSITORY_VALUE="PASSWORD"
+                REQUIRED="true"
+                SHOW_IF="USE_EXISTING_CONNECTION == 'false'"
+        >
+            <DEFAULT>""</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="SCHEMA_FLOW"
+                FIELD="SCHEMA_TYPE"
+                NUM_ROW="60"
+        >
+            <DEFAULT>""</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="SCHEMA_REJECT"
+                FIELD="SCHEMA_TYPE"
+                REQUIRED="true"
+                NUM_ROW="60"
+                CONTEXT="REJECT"
+                SHOW="true">
+            <TABLE READONLY="true">
+                <COLUMN NAME="errorCode" TYPE="id_String" LENGTH="255" READONLY="false" CUSTOM="true"/>
+                <COLUMN NAME="errorMessage" TYPE="id_String" LENGTH="255" READONLY="false" CUSTOM="true"/>
+            </TABLE>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="TABLE"
+                FIELD="DBTABLE"
+                NUM_ROW="60"
+                LOG4J_ENABLED="false"
+        >
+            <DEFAULT>""</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="QUERYSTORE"
+                FIELD="QUERYSTORE_TYPE"
+                NUM_ROW="70"
+        >
+            <DEFAULT>""</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="QUERY"
+                FIELD="MEMO_SQL"
+                NUM_ROW="80"
+        >
+            <DEFAULT>"select id, name from employee"</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="DIE_ON_ERROR"
+                FIELD="CHECK"
+                NUM_ROW="90"
+        >
+            <DEFAULT>false</DEFAULT>
+        </PARAMETER>
+    </PARAMETERS>
+
+    <ADVANCED_PARAMETERS>
+        <PARAMETER NAME="PROPERTIES" FIELD="TEXT" NUM_ROW="4" REPOSITORY_VALUE="PROPERTIES_STRING"
+                   SHOW_IF="USE_EXISTING_CONNECTION == 'false'">
+            <DEFAULT>""</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="PROPAGATE_RECORD_SET"
+                FIELD="CHECK"
+                NUM_ROW="5"
+        >
+            <DEFAULT>false</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="RECORD_SET_COLUMN"
+                FIELD="COLUMN_LIST"
+                NUM_ROW="5"
+                SHOW_IF="PROPAGATE_RECORD_SET == 'true'"
+        />
+
+        <PARAMETER
+                NAME="USE_PREPAREDSTATEMENT"
+                FIELD="CHECK"
+                NUM_ROW="6"
+        >
+            <DEFAULT>false</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="SET_PREPAREDSTATEMENT_PARAMETERS"
+                FIELD="TABLE"
+                REQUIRED="false"
+                NUM_ROW="7"
+                NB_LINES="3"
+                SHOW_IF="(USE_PREPAREDSTATEMENT == 'true')"
+        >
+            <ITEMS>
+                <ITEM NAME="PARAMETER_INDEX" VALUE=""/>
+                <ITEM NAME="PARAMETER_TYPE" VALUE="String" FIELD="CLOSED_LIST">
+                    <ITEMS DEFAULT="String">
+                        <ITEM NAME="BigDecimal" VALUE="BigDecimal"/>
+                        <ITEM NAME="Blob" VALUE="Blob"/>
+                        <ITEM NAME="Boolean" VALUE="Boolean"/>
+                        <ITEM NAME="Byte" VALUE="Byte"/>
+                        <ITEM NAME="Bytes" VALUE="Bytes"/>
+                        <ITEM NAME="Clob" VALUE="Clob"/>
+                        <ITEM NAME="Date" VALUE="Date"/>
+                        <ITEM NAME="Double" VALUE="Double"/>
+                        <ITEM NAME="Float" VALUE="Float"/>
+                        <ITEM NAME="Int" VALUE="Int"/>
+                        <ITEM NAME="Long" VALUE="Long"/>
+                        <ITEM NAME="Object" VALUE="Object"/>
+                        <ITEM NAME="Short" VALUE="Short"/>
+                        <ITEM NAME="String" VALUE="String"/>
+                        <ITEM NAME="Time" VALUE="Time"/>
+                        <ITEM NAME="Null" VALUE="Null"/>
+                    </ITEMS>
+                </ITEM>
+                <ITEM NAME="PARAMETER_VALUE" VALUE=""/>
+            </ITEMS>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="ENCODING"
+                FIELD="ENCODING_TYPE"
+                NUM_ROW="9"
+                REQUIRED="true"
+                SHOW="false"
+        >
+            <DEFAULT>"ISO-8859-15"</DEFAULT>
+        </PARAMETER>
+
+        <PARAMETER
+                NAME="COMMIT_EVERY"
+                FIELD="TEXT"
+                NUM_ROW="9"
+                REQUIRED="true"
+                SHOW_IF="USE_EXISTING_CONNECTION == 'false'"
+        >
+            <DEFAULT>10000</DEFAULT>
+        </PARAMETER>
+    </ADVANCED_PARAMETERS>
+
+    <CODEGENERATION>
+        <TEMPLATES INPUT="in" OUTPUT="out">
+            <TEMPLATE NAME="in" COMPONENT="tMysqlRow">
+                <LINK_TO NAME="out" CTYPE="SUBJOB_OK"/>
+            </TEMPLATE>
+            <TEMPLATE NAME="out" COMPONENT="tDummyRow"/>
+            <TEMPLATE_PARAM SOURCE="self.PROPERTY" TARGET="in.PROPERTY"/>
+            <TEMPLATE_PARAM SOURCE="self.DB_VERSION" TARGET="in.DB_VERSION"/>
+            <TEMPLATE_PARAM SOURCE="self.USE_EXISTING_CONNECTION" TARGET="in.USE_EXISTING_CONNECTION"/>
+            <TEMPLATE_PARAM SOURCE="self.CONNECTION" TARGET="in.CONNECTION"/>
+            <TEMPLATE_PARAM SOURCE="self.HOST" TARGET="in.HOST"/>
+            <TEMPLATE_PARAM SOURCE="self.PORT" TARGET="in.PORT"/>
+            <TEMPLATE_PARAM SOURCE="self.DBNAME" TARGET="in.DBNAME"/>
+            <TEMPLATE_PARAM SOURCE="self.TYPE" TARGET="in.TYPE"/>
+            <TEMPLATE_PARAM SOURCE="self.USER" TARGET="in.USER"/>
+            <TEMPLATE_PARAM SOURCE="self.PASS" TARGET="in.PASS"/>
+            <TEMPLATE_PARAM SOURCE="self.SCHEMA_FLOW" TARGET="in.SCHEMA_FLOW"/>
+            <TEMPLATE_PARAM SOURCE="self.SCHEMA_REJECT" TARGET="in.SCHEMA_REJECT"/>
+            <TEMPLATE_PARAM SOURCE="self.TABLE" TARGET="in.TABLE"/>
+            <TEMPLATE_PARAM SOURCE="self.QUERYSTORE" TARGET="in.QUERYSTORE"/>
+            <TEMPLATE_PARAM SOURCE="self.QUERY" TARGET="in.QUERY"/>
+            <TEMPLATE_PARAM SOURCE="self.DIE_ON_ERROR" TARGET="in.DIE_ON_ERROR"/>
+            <TEMPLATE_PARAM SOURCE="self.PROPERTIES" TARGET="in.PROPERTIES"/>
+            <TEMPLATE_PARAM SOURCE="self.PROPAGATE_RECORD_SET" TARGET="in.PROPAGATE_RECORD_SET"/>
+            <TEMPLATE_PARAM SOURCE="self.RECORD_SET_COLUMN" TARGET="in.RECORD_SET_COLUMN"/>
+            <TEMPLATE_PARAM SOURCE="self.USE_PREPAREDSTATEMENT" TARGET="in.USE_PREPAREDSTATEMENT"/>
+            <TEMPLATE_PARAM SOURCE="self.SET_PREPAREDSTATEMENT_PARAMETERS"
+                            TARGET="in.SET_PREPAREDSTATEMENT_PARAMETERS"/>
+            <TEMPLATE_PARAM SOURCE="self.PARAMETER_INDEX" TARGET="in.PARAMETER_INDEX"/>
+            <TEMPLATE_PARAM SOURCE="self.PARAMETER_TYPE" TARGET="in.PARAMETER_TYPE"/>
+            <TEMPLATE_PARAM SOURCE="self.PARAMETER_VALUE" TARGET="in.PARAMETER_VALUE"/>
+            <TEMPLATE_PARAM SOURCE="self.ENCODING" TARGET="in.ENCODING"/>
+            <TEMPLATE_PARAM SOURCE="self.COMMIT_EVERY" TARGET="in.COMMIT_EVERY"/>
+
+        </TEMPLATES>
+        <IMPORTS>
+            <IMPORT NAME="Driver-Mysql5" MODULE="mysql-connector-java-5.1.30-bin.jar"
+                    MVN="mvn:org.talend.libraries/mysql-connector-java-5.1.30-bin/6.0.0"
+                    REQUIRED_IF="(DB_VERSION == 'MYSQL_5') AND (USE_EXISTING_CONNECTION == 'false')"/>
+        </IMPORTS>
+    </CODEGENERATION>
+
+    <RETURNS>
+        <RETURN NAME="QUERY" TYPE="id_String" AVAILABILITY="FLOW"/>
+    </RETURNS>
+</COMPONENT>

@@ -663,6 +663,10 @@ public class ProcessController extends AbstractElementPropertySectionController 
                 }
                 nbInList++;
             }
+            //TUP-32358,show original version even it is not within the list of ListItemsValue in Combox
+            if (StringUtils.isEmpty(strValue) && EParameterName.PROCESS_TYPE_VERSION.getName().equals(childParameter.getName())) {
+                strValue = (String) childParameter.getValue();
+            }
             String[] paramItems = getListToDisplay(childParameter);
             String[] comboItems = combo.getItems();
 
@@ -762,7 +766,7 @@ public class ProcessController extends AbstractElementPropertySectionController 
         setProcessTypeRelatedValues(processParam, contextNameList, contextValueList,
                 EParameterName.PROCESS_TYPE_CONTEXT.getName(), defalutValue);
 
-        setProcessTypeRelatedValues(processParam, versionNameList, versionValueList,
+        setProcessTypeVersionValues(processParam, versionNameList, versionValueList,
                 EParameterName.PROCESS_TYPE_VERSION.getName(), null);
 
     }
@@ -808,6 +812,53 @@ public class ProcessController extends AbstractElementPropertySectionController 
                     } else {
                         elem.setPropertyValue(fullChildName, valueList.get(valueList.size() - 1));
                     }
+                }
+            } else {
+                // force to store the value again to activate the code
+                // generation in Node.setPropertyValue
+                elem.setPropertyValue(fullChildName, childParam.getValue());
+            }
+        }
+    }
+    
+   /**
+    *
+    * zyuan Comment method "setProcessTypeVersionValues".
+    * For TUP-32358, in order to show error on tRunjob same as joblet if the referred old version do not exist anymore,
+    * do not set default value if the value is not within the ListItemsValue.
+    *
+    */
+    private void setProcessTypeVersionValues(IElementParameter parentParam, List<String> nameList, List<String> valueList,
+            final String childName, final String defaultValue) {
+        if (parentParam == null || childName == null) {
+            return;
+        }
+        final String fullChildName = parentParam.getName() + ":" + childName; //$NON-NLS-1$
+        IElementParameter childParam = parentParam.getChildParameters().get(childName);
+
+        IElementParameter jobNameParam = parentParam.getChildParameters().get(EParameterName.PROCESS_TYPE_PROCESS.getName());
+        if (jobNameParam != null) {
+            String value = (String) jobNameParam.getValue();
+            if (value == null || "".equals(value)) { //$NON-NLS-1$
+                childParam.setValue(null);
+            }
+        }
+        if (nameList == null) {
+            childParam.setListItemsDisplayName(new String[0]);
+        } else {
+            childParam.setListItemsDisplayName(nameList.toArray(new String[0]));
+        }
+        if (valueList == null) {
+            childParam.setListItemsValue(new String[0]);
+        } else {
+            childParam.setListItemsValue(valueList.toArray(new String[0]));
+        }
+
+        if (elem != null) {
+            elem.setPropertyValue(fullChildName, childParam.getValue());
+            if (valueList != null && !valueList.contains(childParam.getValue())) {
+                if (nameList != null && nameList.size() > 0) {
+                    //do not set the default value
                 }
             } else {
                 // force to store the value again to activate the code

@@ -136,9 +136,7 @@ public abstract class JobScriptsExportWizardPage extends WizardFileSystemResourc
 
     private static final String BINARIES = Messages.getString("JavaJobScriptsExportWSWizardPage.POJO.optionType.binaries"); //$NON-NLS-1$
 
-    private static final String SOURCES = Messages.getString("JavaJobScriptsExportWSWizardPage.POJO.optionType.sources") + " (Deprecated)"; //$NON-NLS-1$
-
-    private static final String[] OPTION_TYPES = new String[] { BINARIES, SOURCES };
+    private static final String[] OPTION_TYPES = new String[] { BINARIES };
 
     protected boolean isEnterprise;
 
@@ -706,12 +704,6 @@ public abstract class JobScriptsExportWizardPage extends WizardFileSystemResourc
                 hideControl(addTestSourcesButton, true);
                 hideControl(includeLibsButton, true);
                 jobItemButton.setSelection(true);
-            } else {
-                hideControl(executeTestsButton, true);
-                hideControl(jobScriptButton, true);
-                hideControl(addTestSourcesButton, false);
-                hideControl(includeLibsButton, false);
-                jobItemButton.setSelection(false);
             }
 
             // TDQ-15391: when have tDqReportRun, must always export items.

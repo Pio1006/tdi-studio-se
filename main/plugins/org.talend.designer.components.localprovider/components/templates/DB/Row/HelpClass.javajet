@@ -62,7 +62,11 @@
 	 		useExistingConn = ElementParameterParser.getValue(node,"__USE_EXISTING_CONNECTION__");
 	 		if(("true").equals(useExistingConn)) {
 				String connection = ElementParameterParser.getValue(node,"__CONNECTION__");
-				String conn = "conn_" + connection;;
+				boolean isAmazonAurora = node.isVirtualGenerateNode() && (connection.matches("^.*?tAmazonAuroraConnection_\\d+$") || connection.matches("^.*?tDBConnection_\\d+$"));
+				String conn = "conn_" + connection;
+				if(isAmazonAurora){
+				    conn += "_in";
+                }
 				%>
 				conn_<%=cid%> = (java.sql.Connection)globalMap.get("<%=conn%>");
 			<%

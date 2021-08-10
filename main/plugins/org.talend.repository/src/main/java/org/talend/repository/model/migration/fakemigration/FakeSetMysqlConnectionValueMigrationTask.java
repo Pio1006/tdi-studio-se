@@ -18,12 +18,15 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.talend.commons.exception.ExceptionHandler;
+import org.talend.commons.exception.PersistenceException;
 import org.talend.core.database.EDatabaseTypeName;
 import org.talend.core.model.metadata.builder.connection.DatabaseConnection;
 import org.talend.core.model.migration.AbstractItemMigrationTask;
 import org.talend.core.model.properties.DatabaseConnectionItem;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.repository.ERepositoryObjectType;
+import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.migration.MigrationReportRecorder;
 
 /**
@@ -58,11 +61,18 @@ public class FakeSetMysqlConnectionValueMigrationTask extends AbstractItemMigrat
                 if (StringUtils.isBlank(dbConnection.getServerName())) {
                     dbConnection.setServerName("localhost");
                     generateReportRecord(new MigrationReportRecorder(this, MigrationReportRecorder.MigrationOperationType.ADD,
-                            connectionItem, null, "port", null, "localhost"));
+                            connectionItem, null, "server", null, "localhost"));
                     dbConnection.setPassword("");
-                    generateReportRecord(new MigrationReportRecorder(this, MigrationReportRecorder.MigrationOperationType.DELETE,
-                            connectionItem, null, "password", null, null));
-                    return ExecutionResult.SUCCESS_WITH_ALERT;
+                    try {
+                        ProxyRepositoryFactory.getInstance().save(item, true);
+                        generateReportRecord(
+                                new MigrationReportRecorder(this, MigrationReportRecorder.MigrationOperationType.DELETE,
+                                        connectionItem, null, "password", null, null));
+                        return ExecutionResult.SUCCESS_WITH_ALERT;
+                    } catch (PersistenceException e) {
+                        ExceptionHandler.process(e);
+                        return ExecutionResult.FAILURE;
+                    }
                 }
                 return ExecutionResult.NOTHING_TO_DO;
             }

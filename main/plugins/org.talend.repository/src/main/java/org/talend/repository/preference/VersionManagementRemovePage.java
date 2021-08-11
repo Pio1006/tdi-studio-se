@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.repository.preference;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,9 +24,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -50,8 +55,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.internal.ide.IDEInternalPreferences;
-import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.talend.commons.exception.CommonExceptionHandler;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
@@ -271,7 +274,7 @@ public class VersionManagementRemovePage extends AbstractVersionManagementProjec
             public void modifyText(ModifyEvent e) {
                 String version = versionText.getText();
                 if (isValidItemVersion(version)) {
-                    deleteBtn.setEnabled(true);
+                    checkDeleteBtnState();
                     versionText.setBackground(COLOR_WHITE);
                     versionText.setToolTipText(""); //$NON-NLS-1$
                 } else {
@@ -337,10 +340,9 @@ public class VersionManagementRemovePage extends AbstractVersionManagementProjec
     }
     
     protected void removeOldVersions() {
-        
-        IRunnableWithProgress runnable = new IRunnableWithProgress() {
+        final IWorkspaceRunnable op = new IWorkspaceRunnable() {
             @Override
-            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+            public void run(final IProgressMonitor monitor) throws CoreException {
                 monitor.beginTask("Remove old versions", checkedObjects.size());
                 List<IRepositoryViewObject> versionsToDelete = null;
                 PrintWriter pw = null;
@@ -403,9 +405,9 @@ public class VersionManagementRemovePage extends AbstractVersionManagementProjec
                                     if (!StringUtils.isEmpty(versionToDelete.getPath())) {
                                         versionedLabel = versionToDelete.getPath() + "/" + versionedLabel;
                                     }
-                                    monitor.setTaskName("Removing " + versionToDelete.getRepositoryObjectType() + ":"+  versionedLabel);
                                     //physical delete
                                     if (isLocal) {
+                                        monitor.setTaskName("Removing " + versionToDelete.getRepositoryObjectType() + ":"+  versionedLabel);
                                         factory.deleteOldVersionPhysical(project, versionToDelete, versionToDelete.getProperty().getVersion());
                                     } else {
                                         //batch delete for remote
@@ -444,31 +446,51 @@ public class VersionManagementRemovePage extends AbstractVersionManagementProjec
                         }
                         if (isLocal) monitor.worked(1);
                     }
-                    if (!isLocal) {
-                        monitor.setTaskName("Opertaion in progress...");
-                        monitor.worked(checkedObjects.size()/2);
-                        factory.batchDeleteOldVersionPhysical4Remote(project, batchDeleteObjectList);
+                    //batch deletion for remote
+                    if (!isLocal && batchDeleteObjectList.size() > 0) {
+                        factory.batchDeleteOldVersionPhysical4Remote(project, batchDeleteObjectList, monitor);
+                        monitor.setTaskName("Commit files...");
+                        commiteProjectSettings();
+                        batchDeleteObjectList = new ArrayList<IRepositoryViewObject>();
+                    } else {
+                        if (delNum > 0) factory.saveProject(ProjectManager.getInstance().getCurrentProject());
                     }
+                    monitor.done();
                 } catch (PersistenceException e) {
-                   e.printStackTrace();
-                   throw new  InvocationTargetException(e);
+                    ExceptionHandler.process(e);
                 } catch (FileNotFoundException fnfe) {
-                    throw new  InvocationTargetException(fnfe);
+                    ExceptionHandler.process(fnfe);
+                } catch (InterruptedException e) {
                 } finally {
                     if (pw !=null) pw.close();
                     if (delNum == 0 && reportFile != null) reportFile.delete(); 
                 }
             }
         };
+        
+        IRunnableWithProgress iRunnableWithProgress = new IRunnableWithProgress() {
+
+            @Override
+            public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                IWorkspace workspace = ResourcesPlugin.getWorkspace();
+                try {
+                    ISchedulingRule schedulingRule = workspace.getRoot();
+                    // the update the project files need to be done in the workspace runnable to avoid all
+                    // notification
+                    // of changes before the end of the modifications.
+                    workspace.run(op, schedulingRule, IWorkspace.AVOID_UPDATE, monitor);
+                } catch (CoreException e) {
+                    throw new InvocationTargetException(e);
+                }
+
+            }
+        };
         final ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
         try {
-            dialog.run(true, true, runnable);
+            dialog.run(true, true, iRunnableWithProgress);
         } catch (InvocationTargetException e) {
-            MessageBoxExceptionHandler.process(e);
+            ExceptionHandler.process(e);
         } catch (InterruptedException e) {
-        }
-        if (!ProjectManager.getInstance().getCurrentProject().isLocal()) {
-            commiteProjectSettings();
         }
         if (delNum > 0) {
            ReportDialog dlg = new ReportDialog(removeOldVersionsBtn.getShell(), reportPath, delNum);
@@ -576,17 +598,19 @@ public class VersionManagementRemovePage extends AbstractVersionManagementProjec
     }
     
     private void openInSystemExplorer(String fileLocation) {
-        String command = IDEWorkbenchPlugin.getDefault().getPreferenceStore().getString(IDEInternalPreferences.WORKBENCH_SYSTEM_EXPLORER);
         File dir = new File(fileLocation).getParentFile();
         Process p;
         try {
             if (EnvironmentUtils.isWindowsSystem()) {
-                p = Runtime.getRuntime().exec(command, null, dir);
+                p = Runtime.getRuntime().exec("explorer.exe /select," + fileLocation);
+            } else if (EnvironmentUtils.isMacOsSytem()) {
+                p = Runtime.getRuntime().exec("open -R " + fileLocation);
             } else {
-                p = Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", command},null, dir);
+                Desktop desktop = Desktop.getDesktop();
+                desktop.open(dir);
             }
         } catch (IOException e1) {
-            ExceptionHandler.process(e1);
+            MessageBoxExceptionHandler.process(e1);
         }
     }
     

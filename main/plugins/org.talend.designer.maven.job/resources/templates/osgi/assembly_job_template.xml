@@ -9,6 +9,14 @@
         <format>jar</format>
     </formats>
     <fileSets>
+        <fileSet>
+            <!-- add wsdl -->
+            <directory>${basedir}/src/main/java</directory>
+            <outputDirectory>${file.separator}</outputDirectory>
+            <includes>
+                <include>${talend.job.path}/**/*.wsdl</include>
+            </includes>
+        </fileSet>
         <fileSet> <!-- add java classes -->
             <directory>${project.build.outputDirectory}</directory>
             <outputDirectory>${file.separator}</outputDirectory>

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -31,6 +32,7 @@ import org.osgi.framework.ServiceRegistration;
 import org.talend.commons.CommonsPlugin;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.utils.VersionUtils;
+import org.talend.core.nexus.TalendMavenResolver;
 import org.talend.osgi.hook.maven.MavenResolver;
 import org.talend.sdk.component.studio.debounce.DebounceManager;
 import org.talend.sdk.component.studio.metadata.TaCoKitCache;
@@ -39,6 +41,7 @@ import org.talend.sdk.component.studio.service.AsciidoctorService;
 import org.talend.sdk.component.studio.service.ComponentService;
 import org.talend.sdk.component.studio.service.Configuration;
 import org.talend.sdk.component.studio.service.UiActionsThreadPool;
+import org.talend.sdk.component.studio.util.TaCoKitUtil;
 import org.talend.sdk.component.studio.websocket.WebSocketClient;
 
 public class ServerManager {
@@ -57,7 +60,9 @@ public class ServerManager {
 
     private UiActionsThreadPool uiActionsThreadPool;
 
-    private volatile boolean start;
+    private AtomicBoolean started = new AtomicBoolean(false);
+
+    private AtomicBoolean starting = new AtomicBoolean(true);
 
     private static Object lock = new Object();
 
@@ -80,14 +85,14 @@ public class ServerManager {
         return instance;
     }
 
-    public synchronized void start() throws Exception {
-        if (start) {
+    public void start() {
+        if (!started.compareAndSet(false, true)) {
             return;
         }
         try {
             // make sure all things are cleaned
             try {
-                stop();
+                doStop();
             } catch (Exception e) {
                 ExceptionHandler.process(e);
             }
@@ -110,10 +115,9 @@ public class ServerManager {
 
             reset = Lookups.init();
 
-            final MavenResolver mavenResolver = findMavenResolver();
             final Function<String, File> mvnResolverImpl = gav -> {
                 try { // convert to pax-url syntax
-                    return mavenResolver.resolve(Mvn.locationToMvn(gav));
+                    return TalendMavenResolver.resolve(Mvn.locationToMvn(gav));
                 } catch (final IOException e) {
                     throw new IllegalArgumentException("can't resolve '" + gav + "', "
                             + "in development ensure you are using maven" + ".repository=global in configuration/config.ini, "
@@ -139,15 +143,26 @@ public class ServerManager {
             services.add(ctx.registerService(ComponentService.class.getName(), new ComponentService(mvnResolverImpl),
                     new Hashtable<>()));
             services.add(ctx.registerService(TaCoKitCache.class.getName(), new TaCoKitCache(), new Hashtable<>()));
-            start = true;
-        } catch (Throwable ex) {
-            start = false;
+
             try {
-                stop();
+                TaCoKitUtil.registAllTaCoKitRepositoryTypes();
+            } catch (Exception e) {
+                Exception ex = Lookups.manager().getLoadException();
+                if (ex == null) {
+                    Lookups.manager().setLoadException(e);
+                }
+                ExceptionHandler.process(e);
+            }
+
+            starting.set(false);
+        } catch (Throwable ex) {
+            try {
+                doStop();
             } catch (Exception e) {
                 ExceptionHandler.process(e);
             }
-            throw ex;
+            started.set(false);
+            starting.set(true);
         }
     }
 
@@ -162,10 +177,42 @@ public class ServerManager {
     }
 
     public boolean isStarted() {
-        return start;
+        return !starting.get();
     }
 
     public synchronized void stop() throws Exception {
+        doStop();
+        started.set(false);
+        starting.set(true);
+    }
+
+    public void waitForStart() {
+        if (!starting.get()) {
+            return;
+        }
+        try {
+            start();
+        } catch (Exception e) {
+            ExceptionHandler.process(e);
+        }
+        int spent = 0;
+        int time = 1000;
+        int timeout = 1000 * 60 * 10;
+        while (starting.get()) {
+            try {
+                Thread.sleep(time);
+                spent += time;
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            if (spent >= timeout) {
+                // may be track in dead lock, throw exception to try to break dead lock
+                throw new RuntimeException("Waiting for tck server start timeout!");
+            }
+        }
+    }
+
+    private void doStop() throws Exception {
         services.forEach(ServiceRegistration::unregister);
         services.clear();
 
@@ -213,7 +260,6 @@ public class ServerManager {
         if (error != null) {
             throw error;
         }
-        start = false;
     }
 
     private MavenResolver findMavenResolver() {

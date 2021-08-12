@@ -60,7 +60,6 @@
 			<ITEMS DEFAULT="DATAPROC_1_4_0">
 				<ITEM NAME="DATAPROC_1_4_0" VALUE="&quot;1.4&quot;" />
 				<ITEM NAME="DATAPROC_1_3_0" VALUE="&quot;1.3&quot;" />
-				<ITEM NAME="DATAPROC_1_1_0" VALUE="&quot;1.1&quot;" />
 			</ITEMS>
 		</PARAMETER>
 

@@ -1,7 +1,0 @@
-# Debugging options for the org.talend.designer.business.diagram plug-in
-
-# Turn on general debugging for the org.talend.designer.business.diagram plug-in
-org.talend.designer.business.diagram/debug=false
-
-# Turn on debugging of visualID processing
-org.talend.designer.business.diagram/debug/visualID=true

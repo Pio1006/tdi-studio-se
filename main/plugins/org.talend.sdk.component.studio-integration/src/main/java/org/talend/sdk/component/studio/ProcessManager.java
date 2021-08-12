@@ -50,12 +50,18 @@ import java.util.logging.SimpleFormatter;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.spi.LoggerRepository;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.talend.commons.CommonsPlugin;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.utils.network.NetworkUtil;
 import org.talend.core.GlobalServiceRegister;
+import org.talend.core.model.utils.ComponentGAV;
+import org.talend.core.model.utils.ComponentInstallerTaskRegistryReader;
+import org.talend.core.model.utils.IComponentInstallerTask;
 import org.talend.core.services.ICoreTisService;
 import org.talend.sdk.component.studio.lang.LocalLock;
 import org.talend.sdk.component.studio.lang.StringPropertiesTokenizer;
@@ -89,6 +95,8 @@ public class ProcessManager implements AutoCloseable {
     private Exception loadException;
 
     private String serverAddress;
+
+    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(ProcessManager.class);
 
     public ProcessManager(final String groupId, final Function<String, File> resolver) {
         this.groupId = groupId;
@@ -263,6 +271,14 @@ public class ProcessManager implements AutoCloseable {
     }
 
     public synchronized void start() {
+        String julLevel = System.getProperty("jul.level");
+        if (StringUtils.isNotBlank(julLevel)) {
+            LoggerRepository repository = LogManager.getLoggerRepository();
+            org.apache.log4j.Logger osgiLogger = repository.getLogger(JULToOsgiHandler.class.getCanonicalName());
+            osgiLogger.setLevel(Level.toLevel(julLevel));
+        }
+        
+        reloadProperties();
         final Collection<URL> paths;
         try {
             paths = createClasspath();
@@ -368,9 +384,8 @@ public class ProcessManager implements AutoCloseable {
             public void run() {
 
                 List<String> localHostAddresses = NetworkUtil.getLocalLoopbackAddresses(true);
-                if (CommonsPlugin.isDebugMode()) {
-                    ExceptionHandler.log("Local addresses passed to sdk: " + localHostAddresses);
-                }
+                LOGGER.info("Local addresses passed to sdk: " + localHostAddresses);
+                
                 int addressCount = localHostAddresses.size();
                 final long end = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(15);
                 for (int i = 0; end - System.currentTimeMillis() >= 0; i++) {
@@ -379,17 +394,21 @@ public class ProcessManager implements AutoCloseable {
                         lock.unlock();
                         throw new IllegalStateException("Component server startup failed");
                     }
-                    // 500 * 10 == 5000ms == 5s => means switching address per 5s
-                    int select = Math.abs(i / 10 % addressCount);
-                    String clientIp = localHostAddresses.get(select);
+                    
+                    String clientIp = getServerAddress();
+                    if (StringUtils.isEmpty(clientIp)) {
+                        // 500 * 10 == 5000ms == 5s => means switching address per 5s
+                        int select = Math.abs(i / 10 % addressCount);
+                        clientIp = localHostAddresses.get(select);
+                    }
                     String ip = clientIp;
                     if (ip.startsWith("[") && ip.endsWith("]")) {
                         // ipv6
                         ip = ip.substring(1, ip.length() - 1);
                     }
+                    String urlString = "http://" + clientIp + ":" + port + "/api/v1/environment";
                     try (final Socket ignored = new Socket(ip, port)) {
-                        final URLConnection conn = new URL("http://" + clientIp + ":" + port + "/api/v1/environment")
-                                .openConnection();
+                        final URLConnection conn = new URL(urlString).openConnection();
                         conn.setRequestProperty("Content-Type", "application/json");
                         conn.setRequestProperty("Accept", "application/json");
                         conn.getInputStream().close();
@@ -397,6 +416,7 @@ public class ProcessManager implements AutoCloseable {
                         setServerAddress(clientIp);
                         lock.unlock();
                         ready.countDown();
+                        LOGGER.info("Succeed to connect [" + urlString + "]");
                         return;
                     } catch (final Exception e) {
                         if (CommonsPlugin.isDebugMode()) {
@@ -418,14 +438,46 @@ public class ProcessManager implements AutoCloseable {
 
     private void reloadProperties() {
         try {
+            /*******************************
+             * <pre>
+             * Two cases
+             * 1 - load installed TCK components from config.ini which is the same as before
+             * 2 - load installed TCK components from TCK component plugin registry
+             * </pre>
+             *******************************/
+            StringBuilder sb = new StringBuilder();
             final String value = TaCoKitUtil.getInstalledComponentsString(new NullProgressMonitor());
-            if (value == null) {
-                return;
+            if (!StringUtils.isEmpty(value)) {
+                sb.append(value);
             }
-            System.setProperty(TaCoKitConst.PROP_COMPONENT, value);
+            String installedOfficialTCKComponents = getInstalledTCKComponents();
+            if (!StringUtils.isEmpty(installedOfficialTCKComponents)) {
+                if (sb.length() > 0) {
+                    sb.append(",");
+                }
+                sb.append(installedOfficialTCKComponents);
+            }
+
+            System.setProperty(TaCoKitConst.PROP_COMPONENT, sb.toString());
         } catch (Exception e) {
             ExceptionHandler.process(e);
         }
+    }
+    
+    private String getInstalledTCKComponents() {
+        List<IComponentInstallerTask> tasks = ComponentInstallerTaskRegistryReader.getInstance().getTasks(IComponentInstallerTask.COMPONENT_TYPE_TCOMPV1);
+        final StringBuilder sb = new StringBuilder();
+        tasks.forEach(t -> {
+            Set<ComponentGAV> gavs = t.getComponentGAV();
+            gavs.forEach(gav -> {
+                if (sb.length() > 0) {
+                    sb.append(",");
+                }
+                sb.append(gav.toCoordinateStr());
+            });
+        });
+
+        return sb.toString();
     }
 
     private void updateProperties() {
@@ -623,6 +675,7 @@ public class ProcessManager implements AutoCloseable {
         final Integer port = Integer.getInteger("component.java.port", -1);
         if (port <= 0) {
             try (ServerSocket socket = new ServerSocket(0)) {
+                socket.setReuseAddress(true);
                 return socket.getLocalPort();
             } catch (final IOException e) {
                 throw new IllegalStateException(e);

@@ -269,6 +269,9 @@ public class BuildJobHandler extends AbstractBuildJobHandler {
                 FilesUtils.deleteFolder(reports, false);
             }
         }
+        if (ProcessorUtilities.isNeedExportItemsForDQ()) {
+            exportChoice.put(ExportChoice.needJobItem, true);
+        }
         if (isOptionChoosed(ExportChoice.needJobItem)) {
             File destination = new File(itemsFolder.getLocation().toFile().getAbsolutePath());
             exportItemUtil.setProjectNameAsLowerCase(isProjectNameLowerCase());

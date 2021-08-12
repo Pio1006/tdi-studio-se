@@ -62,18 +62,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
-						<dependencies>
-							<dependency>
-				              	<groupId>commons-codec</groupId>
-								<artifactId>commons-codec</artifactId>
-								<version>1.15</version>
-				            </dependency>
-				            <dependency>
-								<groupId>org.apache.commons</groupId>
-								<artifactId>commons-compress</artifactId>
-							<version>1.20</version>
-						</dependency>
-						</dependencies>
 						<executions>
 							<execution>
 								<phase>package</phase>
@@ -131,7 +119,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<!-- by default, all excluded, fixing that when "include-libs" profile 
+				<!-- by default, all excluded, fixing that when "include-libs" profile
 					is not active, export the libraries always. -->
 				<talend.libraries.excludes.set>*:*</talend.libraries.excludes.set>
 				<talend.jobs.excludes.set>*:*</talend.jobs.excludes.set>
@@ -280,7 +268,7 @@
 				<microservice.running.configs.dir>${current.int-resources.dir}/</microservice.running.configs.dir>
 			</properties>
 		</profile>
-		
+
 		<profile>
 			<id>include-microservice-em-dependencies</id>
 			<activation>
@@ -298,13 +286,6 @@
 			    <plugins>
 			        <plugin>
 			            <artifactId>maven-assembly-plugin</artifactId>
-			            <dependencies>
-							<dependency>
-								<groupId>org.apache.commons</groupId>
-								<artifactId>commons-compress</artifactId>
-								<version>1.20</version>
-							</dependency>
-						</dependencies>
 			            <executions>
 			                <execution>
 			                    <phase>package</phase>

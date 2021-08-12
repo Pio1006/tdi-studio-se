@@ -34,7 +34,7 @@ import org.talend.core.runtime.util.SharedStudioUtils;
 public class TemplateProcessor {
 
     public static boolean processTemplate(String logTag, Map<String, Object> contextParams,
-            OutputStream outputStream, InputStream templateStream) throws IOException {
+            OutputStream outputStream, InputStream templateStream, boolean escapeXml) throws IOException {
 
         final Reader templateReader = new InputStreamReader(templateStream);
         final Writer outputWriter = new OutputStreamWriter(outputStream);
@@ -47,8 +47,9 @@ public class TemplateProcessor {
 //          engine.setProperty("resource.loader", "classpath"); //$NON-NLS-1$ //$NON-NLS-2$
 //          engine.setProperty("classpath.resource.loader.class", //$NON-NLS-1$
 //                  "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader"); //$NON-NLS-1$
-            engine.setProperty(RuntimeConstants.EVENTHANDLER_REFERENCEINSERTION,
-                EscapeXmlReference.class.getName());
+            if (escapeXml) {
+                engine.setProperty(RuntimeConstants.EVENTHANDLER_REFERENCEINSERTION, EscapeXmlReference.class.getName());
+            }
             if (SharedStudioUtils.isSharedStudioMode()) {
                 engine.setProperty(RuntimeConstants.RUNTIME_LOG,
                         Platform.getConfigurationLocation().getURL().getFile() + "/velocity.log");
@@ -76,7 +77,17 @@ public class TemplateProcessor {
     }
 
     public static boolean processTemplate(String logTag, Map<String, Object> contextParams,
+            OutputStream outputStream, InputStream templateStream) throws IOException {
+        return processTemplate(logTag, contextParams, outputStream, templateStream, true);
+    }
+
+    public static boolean processTemplate(String logTag, Map<String, Object> contextParams,
         File file, InputStream templateStream) throws IOException {
         return processTemplate(logTag, contextParams, new FileOutputStream(file), templateStream);
+    }
+
+    public static boolean processTemplate(String logTag, Map<String, Object> contextParams, File file, InputStream templateStream,
+            boolean escapeXml) throws IOException {
+        return processTemplate(logTag, contextParams, new FileOutputStream(file), templateStream, escapeXml);
     }
 }

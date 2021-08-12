@@ -19,6 +19,7 @@ import static java.util.Optional.ofNullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 
 import org.eclipse.core.runtime.Platform;
@@ -26,6 +27,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.talend.commons.CommonsPlugin;
 import org.talend.core.GlobalServiceRegister;
 import org.talend.core.IService;
 import org.talend.core.model.components.IComponent;
@@ -52,6 +54,11 @@ public final class Lookups {
     }
 
     public static Runnable init() {
+        if (CommonsPlugin.isHeadless()) {
+            // currently the following service proxy only used for GUI part, ignore it in cmd
+            return () -> {
+            };
+        }
         try {
             final Field instance = GlobalServiceRegister.class.getDeclaredField("instance");
             if (!instance.isAccessible()) {
@@ -160,7 +167,9 @@ public final class Lookups {
             Field[] fields = GlobalServiceRegister.class.getDeclaredFields();
             for (Field field : fields) {
                 field.setAccessible(true);
-                field.set(enrichedRegister, field.get(instance));
+                if (!Modifier.isFinal(field.getModifiers())) {
+                    field.set(enrichedRegister, field.get(instance));
+                }
             }
             return enrichedRegister;
         }

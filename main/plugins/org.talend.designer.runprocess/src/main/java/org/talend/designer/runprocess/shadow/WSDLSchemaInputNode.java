@@ -130,6 +130,8 @@ public class WSDLSchemaInputNode extends FileInputNode {
             addParameter(param);
         }
 
+        param = new TextElementParameter("API", "AXIS"); //$NON-NLS-1$
+        addParameter(param);
     }
 
     private void addPerlParameters(WSDLSchemaBean schemaBean) {

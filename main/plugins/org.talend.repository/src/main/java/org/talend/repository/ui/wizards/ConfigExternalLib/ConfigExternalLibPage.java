@@ -25,7 +25,6 @@ import org.talend.core.model.properties.Item;
 import org.talend.core.model.properties.RoutineItem;
 import org.talend.core.model.properties.RoutinesJarItem;
 import org.talend.core.model.repository.IRepositoryViewObject;
-import org.talend.core.model.repository.SVNConstant;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.core.runtime.CoreRuntimePlugin;
 import org.talend.repository.ProjectManager;
@@ -100,7 +99,7 @@ public abstract class ConfigExternalLibPage extends WizardPage {
     private boolean isOnTag() {
         Project currentProject = ProjectManager.getInstance().getCurrentProject();
         String branch = ProjectManager.getCurrentBranchLabel(currentProject);
-        return isOnTagGit(branch) || isOnTagSvn(branch);
+        return isOnTagGit(branch);
     }
 
     private boolean isOnTagGit(String branch) {
@@ -108,14 +107,6 @@ public abstract class ConfigExternalLibPage extends WizardPage {
             return false;
         }
         return branch.startsWith(ProjectManager.NAME_TAGS + ProjectManager.SEP_CHAR);
-    }
-
-    private boolean isOnTagSvn(String branch) {
-        if (branch == null) {
-            return false;
-        }
-        return branch.startsWith(SVNConstant.SEP_CHAR + SVNConstant.NAME_TAGS + SVNConstant.SEP_CHAR)
-                || branch.startsWith(SVNConstant.NAME_TAGS + SVNConstant.SEP_CHAR);
     }
 
     private RepositoryContext getRepositoryContext() {

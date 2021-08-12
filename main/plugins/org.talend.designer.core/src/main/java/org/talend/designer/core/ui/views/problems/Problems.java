@@ -48,8 +48,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
 import org.talend.core.CorePlugin;
-import org.talend.core.GlobalServiceRegister;
-import org.talend.core.PluginChecker;
 import org.talend.core.model.process.Element;
 import org.talend.core.model.process.INode;
 import org.talend.core.model.process.IProcess;
@@ -65,7 +63,6 @@ import org.talend.core.model.properties.PropertiesFactory;
 import org.talend.core.model.properties.Property;
 import org.talend.core.model.properties.RoutineItem;
 import org.talend.core.model.repository.ERepositoryObjectType;
-import org.talend.core.services.ISVNProviderService;
 import org.talend.designer.core.DesignerPlugin;
 import org.talend.designer.core.i18n.Messages;
 import org.talend.designer.core.ui.editor.nodes.Node;
@@ -778,18 +775,6 @@ public class Problems {
             }
         }
 
-    }
-
-    private static boolean isSVN() {
-        boolean isSvn = false;
-        ISVNProviderService service = null;
-        if (PluginChecker.isSVNProviderPluginLoaded()) {
-            service = (ISVNProviderService) GlobalServiceRegister.getDefault().getService(ISVNProviderService.class);
-        }
-        if (service != null && service.isProjectInSvnMode()) {
-            isSvn = service.isProjectInSvnMode();
-        }
-        return isSvn;
     }
 
     private static String getFileName(IFile file) {

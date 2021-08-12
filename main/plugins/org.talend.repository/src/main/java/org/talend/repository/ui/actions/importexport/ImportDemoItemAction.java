@@ -74,9 +74,6 @@ public class ImportDemoItemAction extends AContextualAction implements IWorkbenc
                 if (repositoryNode.getContentType() == ERepositoryObjectType.REFERENCED_PROJECTS) {
                     canWork = false;
                 }
-                if (repositoryNode.getContentType() == ERepositoryObjectType.SVN_ROOT) {
-                    canWork = false;
-                }
                 if (repositoryNode.getObject() != null
                         && repositoryNode.getObject().getRepositoryStatus() == ERepositoryStatus.DELETED) {
                     canWork = false;

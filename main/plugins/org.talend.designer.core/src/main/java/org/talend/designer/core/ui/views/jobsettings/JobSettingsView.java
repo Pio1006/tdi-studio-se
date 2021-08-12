@@ -67,7 +67,6 @@ import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.core.repository.ui.editor.RepositoryEditorInput;
 import org.talend.core.runtime.services.IGenericWizardService;
 import org.talend.core.services.IGITProviderService;
-import org.talend.core.services.ISVNProviderService;
 import org.talend.core.ui.CoreUIPlugin;
 import org.talend.core.ui.IHeaderFooterProviderService;
 import org.talend.core.ui.branding.IBrandingService;
@@ -76,7 +75,6 @@ import org.talend.core.ui.properties.tab.HorizontalTabFactory;
 import org.talend.core.ui.properties.tab.IDynamicProperty;
 import org.talend.core.ui.properties.tab.TalendPropertyTabDescriptor;
 import org.talend.core.ui.services.IGitUIProviderService;
-import org.talend.core.ui.services.ISVNUiProviderService;
 import org.talend.designer.business.diagram.custom.IDiagramModelService;
 import org.talend.designer.core.i18n.Messages;
 import org.talend.designer.core.model.process.AbstractProcessProvider;
@@ -131,10 +129,6 @@ public class JobSettingsView extends ViewPart implements IJobSettingsView, ISele
 
     private ISelection selectedModel;
 
-    private ISVNProviderService svnService;
-
-    private ISVNUiProviderService svnUIService;
-
     private IGITProviderService gitService;
 
     private IGitUIProviderService gitUIService;
@@ -152,11 +146,6 @@ public class JobSettingsView extends ViewPart implements IJobSettingsView, ISele
     }
 
     private void initProviderServices() {
-
-        if (PluginChecker.isSVNProviderPluginLoaded()) {
-            svnService = (ISVNProviderService) GlobalServiceRegister.getDefault().getService(ISVNProviderService.class);
-            svnUIService = (ISVNUiProviderService) GlobalServiceRegister.getDefault().getService(ISVNUiProviderService.class);
-        }
         if (PluginChecker.isGITProviderPluginLoaded()) {
             gitService = (IGITProviderService) GlobalServiceRegister.getDefault().getService(IGITProviderService.class);
             gitUIService = (IGitUIProviderService) GlobalServiceRegister.getDefault().getService(IGitUIProviderService.class);
@@ -319,9 +308,6 @@ public class JobSettingsView extends ViewPart implements IJobSettingsView, ISele
                             (IRepositoryViewObject) data);
                 }
             }
-        } else if (EComponentCategory.SVNHISTORY.equals(category) && svnUIService != null) {
-            dynamicComposite = svnUIService.createProcessSVNHistoryComposite(parent, tabFactory.getWidgetFactory(),
-                    (IRepositoryViewObject) data);
         } else if (EComponentCategory.GITHISTORY.equals(category) && gitUIService != null) {
             dynamicComposite = gitUIService.createProcessGitHistoryComposite(parent, this, tabFactory.getWidgetFactory(),
                     (IRepositoryViewObject) data);
@@ -590,11 +576,6 @@ public class JobSettingsView extends ViewPart implements IJobSettingsView, ISele
                 }
             }
 
-            // if svn remote connection, added by nma
-            if (svnService != null && svnService.isProjectInSvnMode() && !isOfflineMode) {
-                category.add(EComponentCategory.SVNHISTORY);
-            }
-
             if (gitService != null && gitService.isProjectInGitMode() && !isOfflineMode) {
                 category.add(EComponentCategory.GITHISTORY);
             }
@@ -605,12 +586,7 @@ public class JobSettingsView extends ViewPart implements IJobSettingsView, ISele
                 category.add(EComponentCategory.VERSIONS);
             }
 
-            if (svnService != null && svnService.isProjectInSvnMode() && !isOfflineMode
-                    && (((IRepositoryViewObject) obj).getRepositoryObjectType() == ERepositoryObjectType.JOBLET
-                            || ERepositoryObjectType.getAllTypesOfProcess()
-                                    .contains(((IRepositoryViewObject) obj).getRepositoryObjectType()))) {
-                category.add(EComponentCategory.SVNHISTORY);
-            } else if (gitService != null && gitService.isProjectInGitMode() && !isOfflineMode
+            if (gitService != null && gitService.isProjectInGitMode() && !isOfflineMode
                     && (((IRepositoryViewObject) obj).getRepositoryObjectType() == ERepositoryObjectType.JOBLET
                             || ERepositoryObjectType.getAllTypesOfProcess()
                                     .contains(((IRepositoryViewObject) obj).getRepositoryObjectType()))) {
@@ -913,10 +889,6 @@ public class JobSettingsView extends ViewPart implements IJobSettingsView, ISele
      */
     @Override
     public ISelection getSelection() {
-        ISVNUiProviderService service = null;
-        if (PluginChecker.isSVNProviderPluginLoaded()) {
-            service = (ISVNUiProviderService) GlobalServiceRegister.getDefault().getService(ISVNUiProviderService.class);
-        }
         if (currentSelectedTab == null) {
             return null;
         }
@@ -924,8 +896,6 @@ public class JobSettingsView extends ViewPart implements IJobSettingsView, ISele
         if (dc instanceof ProcessVersionComposite) {
             return ((ProcessVersionComposite) dc).getSelection();
 
-        } else if (service != null && service.isSVNHistoryComposite(dc)) {
-            return service.getSVNHistorySelection(dc);
         } else if (CorePlugin.getDefault().getDiagramModelService().isInstanceOfBusinessAssignmentComposite(dc)) {
             IRepositoryView repositoryView = RepositoryManagerHelper.findRepositoryView();
             if (repositoryView != null) {

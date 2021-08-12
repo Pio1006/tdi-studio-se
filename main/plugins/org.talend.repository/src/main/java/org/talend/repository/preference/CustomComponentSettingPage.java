@@ -59,14 +59,12 @@ import org.talend.commons.ui.runtime.image.ImageProvider;
 import org.talend.commons.ui.swt.advanced.composite.ThreeCompositesSashForm;
 import org.talend.commons.utils.io.FilesUtils;
 import org.talend.core.CorePlugin;
-import org.talend.core.GlobalServiceRegister;
 import org.talend.core.PluginChecker;
 import org.talend.core.model.components.IComponent;
 import org.talend.core.model.properties.CustomComponentSetting;
 import org.talend.core.model.properties.PropertiesFactory;
 import org.talend.core.model.repository.ERepositoryObjectType;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
-import org.talend.core.services.ISVNProviderService;
 import org.talend.core.ui.component.ComponentsFactoryProvider;
 import org.talend.repository.RepositoryWorkUnit;
 import org.talend.repository.model.IProxyRepositoryFactory;
@@ -393,8 +391,6 @@ public class CustomComponentSettingPage extends ProjectSettingPage {
                         @Override
                         public void run(IProgressMonitor subMonitor) throws CoreException {
 
-                            ISVNProviderService service = (ISVNProviderService) GlobalServiceRegister.getDefault().getService(
-                                    ISVNProviderService.class);
                             String projectLabel = pro.getTechnicalLabel();
                             IWorkspace workspace = ResourcesPlugin.getWorkspace();
                             IProject eclipseProject = workspace.getRoot().getProject(projectLabel);
@@ -411,16 +407,9 @@ public class CustomComponentSettingPage extends ProjectSettingPage {
                                 // delete share
                                 for (IComponent component : backAdded.keySet()) {
                                     String componentFullPath = targetRoot + File.separator + component.getName();
-                                    if (service.isSVNProject(pro)) {
-                                        service.svnEclipseHandlerDelete(eclipseProject, pro, componentFullPath);
-                                        if (subMonitor != null) {
-                                            subMonitor.worked(10);
-                                        }
-                                    } else {
-                                        File file = new File(componentFullPath);
-                                        if (file != null && file.exists()) {
-                                            org.talend.utils.io.FilesUtils.deleteFolder(file, true);
-                                        }
+                                    File file = new File(componentFullPath);
+                                    if (file != null && file.exists()) {
+                                        org.talend.utils.io.FilesUtils.deleteFolder(file, true);
                                     }
                                 }
                                 if (!backAdded.isEmpty()) {

@@ -28,7 +28,6 @@ import org.talend.commons.runtime.model.repository.ERepositoryStatus;
 import org.talend.commons.ui.runtime.exception.ExceptionHandler;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.core.GlobalServiceRegister;
-import org.talend.core.PluginChecker;
 import org.talend.core.model.components.ComponentUtilities;
 import org.talend.core.model.components.EComponentType;
 import org.talend.core.model.components.IComponent;
@@ -50,7 +49,6 @@ import org.talend.core.repository.ui.editor.RepositoryEditorInput;
 import org.talend.core.runtime.CoreRuntimePlugin;
 import org.talend.core.runtime.projectsetting.IProjectSettingPreferenceConstants;
 import org.talend.core.runtime.projectsetting.ProjectPreferenceManager;
-import org.talend.core.services.ISVNProviderService;
 import org.talend.core.ui.IJobletProviderService;
 import org.talend.core.ui.component.ComponentsFactoryProvider;
 import org.talend.daikon.NamedThing;
@@ -579,24 +577,6 @@ public class JobletUtil {
                     if (((Node) node).isJoblet() && jobletItem.getProperty() != null) {
                         if (jobletItem.getProperty().getId().equals(node.getComponent().getProcess().getId())) {
                             boolean haveLock = jobletItem.getState().isLocked();
-                            boolean isSvn = false;
-                            ISVNProviderService service = null;
-                            if (PluginChecker.isSVNProviderPluginLoaded()) {
-                                service = (ISVNProviderService) GlobalServiceRegister.getDefault().getService(
-                                        ISVNProviderService.class);
-                            }
-                            if (service != null && service.isProjectInSvnMode()) {
-                                isSvn = service.isProjectInSvnMode();
-                            }
-                            if (isSvn) {
-                                IProxyRepositoryService proxyService = (IProxyRepositoryService) GlobalServiceRegister
-                                        .getDefault().getService(IProxyRepositoryService.class);
-                                IProxyRepositoryFactory factory = proxyService.getProxyRepositoryFactory();
-                                ERepositoryStatus repositoryStatus = factory.getStatus(jobletItem);
-                                if (repositoryStatus == ERepositoryStatus.LOCK_BY_USER) {
-                                    haveLock = true;
-                                }
-                            }
                             if (haveLock) {
                                 return true;
                             }

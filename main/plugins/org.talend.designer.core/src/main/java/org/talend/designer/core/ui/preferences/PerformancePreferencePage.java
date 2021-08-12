@@ -157,32 +157,6 @@ public class PerformancePreferencePage extends FieldEditorPreferencePage impleme
 
     private void addRemoteInforAutoCheckFiled() {
         if (PluginChecker.isRemoteProviderPluginLoaded()) {
-            if (PluginChecker.isSVNProviderPluginLoaded()) {
-                final CheckBoxFieldEditor autoCheckField = new CheckBoxFieldEditor(
-                        ITalendCorePrefConstants.SVN_UPDATE_INFO_AUTO_CHECK,
-                        Messages.getString("PerformancePreferencePage.autoCheckField"), getFieldEditorParent()); //$NON-NLS-1$
-                addField(autoCheckField);
-                final IntegerFieldEditor autoCheckTime = new IntegerFieldEditor(
-                        ITalendCorePrefConstants.SVN_UPDATE_INFO_AUTO_CHECK_TIME_INTERVAL,
-                        Messages.getString("PerformancePreferencePage.autoCheckTime"), //$NON-NLS-1$
-                        getFieldEditorParent());
-                autoCheckTime.setValidRange(1, 30);
-                autoCheckTime.setEnabled(getPreferenceStore().getBoolean(ITalendCorePrefConstants.SVN_UPDATE_INFO_AUTO_CHECK),
-                        getFieldEditorParent());
-                addField(autoCheckTime);
-                autoCheckField.getButton().addSelectionListener(new SelectionAdapter() {
-
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        if (autoCheckField.getButton().getSelection()) {
-                            autoCheckTime.setEnabled(true, getFieldEditorParent());
-                        } else {
-                            autoCheckTime.setEnabled(false, getFieldEditorParent());
-                        }
-                    }
-                });
-            }
-
             final CheckBoxFieldEditor autoRefreshLocksField = new CheckBoxFieldEditor(ITalendCorePrefConstants.AUTO_REFRESH_LOCKS,
                     Messages.getString("PerformancePreferencePage.autoRefreshLocksField"), getFieldEditorParent()); //$NON-NLS-1$
             addField(autoRefreshLocksField);

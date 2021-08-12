@@ -449,9 +449,6 @@ public class ExportItemWizardPage extends WizardPage {
     }
 
     private void expandParent(TreeViewer viewer, Object nodeObject, ERepositoryObjectType type) {
-        if (type == ERepositoryObjectType.SVN_ROOT) {
-            viewer.setExpandedState(nodeObject, true);
-        }
         Object parent = getParentNode(nodeObject);
 
         if (parent != null) {

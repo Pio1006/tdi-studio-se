@@ -80,7 +80,6 @@ import org.talend.core.runtime.CoreRuntimePlugin;
 import org.talend.core.runtime.projectsetting.IProjectSettingPreferenceConstants;
 import org.talend.core.runtime.projectsetting.ProjectPreferenceManager;
 import org.talend.core.services.IGITProviderService;
-import org.talend.core.services.ISVNProviderService;
 import org.talend.repository.ProjectManager;
 import org.talend.repository.ReferenceProjectProblemManager;
 import org.talend.repository.ReferenceProjectProvider;
@@ -103,8 +102,6 @@ public class ProjectRefSettingPage extends ProjectSettingPage {
 
     private static final int REPOSITORY_GIT = 1;
 
-    private static final int REPOSITORY_SVN = 2;
-
     private ListViewer viewer;
 
     private Combo projectCombo;
@@ -121,8 +118,6 @@ public class ProjectRefSettingPage extends ProjectSettingPage {
 
     private Project lastSelectedProject;
 
-    private ISVNProviderService svnProviderService;
-
     private IGITProviderService gitProviderService;
 
     private List<ProjectReferenceBean> originInput = new ArrayList<ProjectReferenceBean>();
@@ -138,14 +133,6 @@ public class ProjectRefSettingPage extends ProjectSettingPage {
         noDefaultAndApplyButton();
         if (PluginChecker.isRemoteProviderPluginLoaded()) {
             GlobalServiceRegister gsr = GlobalServiceRegister.getDefault();
-            try {
-                if (gsr.isServiceRegistered(ISVNProviderService.class)) {
-                    svnProviderService = (ISVNProviderService) GlobalServiceRegister.getDefault()
-                            .getService(ISVNProviderService.class);
-                }
-            } catch (Exception e) {
-                ExceptionHandler.process(e);
-            }
             try {
                 if (gsr.isServiceRegistered(IGITProviderService.class)) {
                     gitProviderService = (IGITProviderService) GlobalServiceRegister.getDefault()
@@ -407,9 +394,6 @@ public class ProjectRefSettingPage extends ProjectSettingPage {
                     return REPOSITORY_GIT;
                 }
             }
-            if (svnProviderService != null && svnProviderService.isSVNProject(project)) {
-                return REPOSITORY_SVN;
-            }
         } catch (PersistenceException ex) {
             ExceptionHandler.process(ex);
         }
@@ -457,10 +441,6 @@ public class ProjectRefSettingPage extends ProjectSettingPage {
         if (REPOSITORY_LOCAL == projectRepositoryType) {
             return;
         }
-        if (projectRepositoryType == REPOSITORY_SVN && this.getRepositoryContext().isOffline()) {
-            this.setErrorMessage(Messages.getString("ReferenceProjectSetupPage.ErrorCanNotGetSVNBranchData")); //$NON-NLS-1$
-            return;
-        }
         OverTimePopupDialogTask<List<String>> overTimePopupDialogTask = new OverTimePopupDialogTask<List<String>>() {
 
             @Override
@@ -479,13 +459,7 @@ public class ProjectRefSettingPage extends ProjectSettingPage {
             if (allBranch != null) {
                 branchCombo.setItems(allBranch.toArray(new String[0]));
             }
-            if (projectRepositoryType == REPOSITORY_SVN) {
-                if (!allBranch.contains(SVNConstant.NAME_TRUNK)) {
-                    allBranch.add(SVNConstant.NAME_TRUNK);
-                }
-                branchCombo.setItems(allBranch.toArray(new String[0]));
-                branchCombo.setText(SVNConstant.NAME_TRUNK);
-            } else if (projectRepositoryType == REPOSITORY_GIT) {
+            if (projectRepositoryType == REPOSITORY_GIT) {
                 branchCombo.setItems(allBranch.toArray(new String[0]));
                 String branch = null;
                 if (allBranch.contains(SVNConstant.NAME_MAIN)) {

@@ -110,7 +110,6 @@ import org.talend.core.repository.utils.RepositoryPathProvider;
 import org.talend.core.runtime.util.SharedStudioUtils;
 import org.talend.core.services.ICoreTisService;
 import org.talend.core.services.IGITProviderService;
-import org.talend.core.services.ISVNProviderService;
 import org.talend.core.ui.branding.IBrandingService;
 import org.talend.core.ui.component.ComponentsFactoryProvider;
 import org.talend.core.ui.services.IRulesProviderService;
@@ -157,7 +156,6 @@ public class RepositoryService implements IRepositoryService, IRepositoryContext
 
     private static Logger log = Logger.getLogger(RepositoryService.class);
 
-    private ISVNProviderService svnProviderService;
     private IGITProviderService gitProviderService;
     private boolean isInitedProviderService = false;
     private final Semaphore askUserForNetworkIssueSemaphore = new Semaphore(1, true);
@@ -495,17 +493,6 @@ public class RepositoryService implements IRepositoryService, IRepositoryContext
                             preferenceManipulator.getLastSVNBranch(
                                     new JSONObject(project.getEmfProject().getUrl()).getString("location"),
                                     project.getTechnicalLabel()));
-                }
-                if (project != null && reload && lastBean != null && repositoryFactory.getRepositoryContext().isOffline()) {
-                    if (PluginChecker.isSVNProviderPluginLoaded()) {
-                        ISVNProviderService svnProviderService = GlobalServiceRegister.getDefault()
-                                .getService(ISVNProviderService.class);
-                        if (svnProviderService.isSVNProject(project)) {
-                            String projectUrl = svnProviderService.getProjectUrl(project);
-                            String lastBranch = preferenceManipulator.getLastSVNBranch(projectUrl, project.getTechnicalLabel());
-                            ProjectManager.getInstance().setMainProjectBranch(project, lastBranch);
-                        }
-                    }
                 }
                 if (project == null) {
                     throw new LoginException(Messages.getString("RepositoryService.projectNotFound", projectName)); //$NON-NLS-1$
@@ -873,13 +860,6 @@ public class RepositoryService implements IRepositoryService, IRepositoryContext
         }
         if (project != null) {
             try {
-                if (!project.isLocal() && svnProviderService != null && svnProviderService.isSVNProject(project)) {
-                    branchesList.add(SVNConstant.NAME_TRUNK);
-                    String[] branchList = svnProviderService.getBranchList(project);
-                    if (branchList != null) {
-                        branchesList.addAll(Arrays.asList(branchList));
-                    }
-                }
                 if (!project.isLocal() && gitProviderService != null && gitProviderService.isGITProject(project)) {
                     branchesList.addAll(Arrays.asList(gitProviderService.getBranchList(project, onlyLocalIfPossible)));
                 }
@@ -893,14 +873,6 @@ public class RepositoryService implements IRepositoryService, IRepositoryContext
     private void initProviderService() {
         if (PluginChecker.isRemoteProviderPluginLoaded()) {
             GlobalServiceRegister gsr = GlobalServiceRegister.getDefault();
-            try {
-                if (gsr.isServiceRegistered(ISVNProviderService.class)) {
-                    svnProviderService = (ISVNProviderService) GlobalServiceRegister.getDefault()
-                            .getService(ISVNProviderService.class);
-                }
-            } catch (Exception e) {
-                ExceptionHandler.process(e);
-            }
             try {
                 if (gsr.isServiceRegistered(IGITProviderService.class)) {
                     gitProviderService = (IGITProviderService) GlobalServiceRegister.getDefault()
@@ -990,16 +962,6 @@ public class RepositoryService implements IRepositoryService, IRepositoryContext
         return NetworkErrorRetryDialog.BUTTON_RETRY_INDEX == result;
     }
 
-    @Override
-    public boolean isSVN() {
-        if (svnProviderService == null && PluginChecker.isSVNProviderPluginLoaded()) {
-            svnProviderService = GlobalServiceRegister.getDefault().getService(ISVNProviderService.class);
-        }
-        if (svnProviderService != null) {
-            return svnProviderService.isProjectInSvnMode();
-        }
-        return false;
-    }
 
     @Override
     public boolean isGIT() {

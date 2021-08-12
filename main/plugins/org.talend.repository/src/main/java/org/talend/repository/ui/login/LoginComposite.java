@@ -109,7 +109,6 @@ import org.talend.core.repository.model.provider.LoginConnectionManager;
 import org.talend.core.repository.services.ILoginConnectionService;
 import org.talend.core.runtime.CoreRuntimePlugin;
 import org.talend.core.services.ICoreTisService;
-import org.talend.core.services.ISVNProviderService;
 import org.talend.core.ui.TalendBrowserLaunchHelper;
 import org.talend.core.ui.branding.IBrandingService;
 import org.talend.core.ui.workspace.ChooseWorkspaceData;
@@ -2534,18 +2533,6 @@ public class LoginComposite extends Composite {
         return this.storedConnections;
     }
 
-    private ISVNProviderService getSVNService() {
-        ISVNProviderService service = null;
-        if (PluginChecker.isSVNProviderPluginLoaded()) {
-            try {
-                service = (ISVNProviderService) GlobalServiceRegister.getDefault().getService(ISVNProviderService.class);
-            } catch (RuntimeException e) {
-                // nothing to do
-            }
-        }
-        return service;
-    }
-
     public String getBranch() {
         Project project = getProject();
         if (branchesViewer != null && !branchesViewer.getSelection().isEmpty() && project != null) {
@@ -2591,7 +2578,7 @@ public class LoginComposite extends Composite {
                     @Override
                     protected IStatus run(IProgressMonitor monitor) {
                         projectBranches.clear();
-                        projectBranches.addAll(getProjectBranches(currentProjectSettings));
+                        // projectBranches.addAll(getProjectBranches(currentProjectSettings));
                         return org.eclipse.core.runtime.Status.OK_STATUS;
                     }
 
@@ -2634,21 +2621,21 @@ public class LoginComposite extends Composite {
 
     private List<String> getProjectBranches(Project p) {
         List<String> brancesList = new ArrayList<String>();
-        ISVNProviderService svnService = getSVNService();
-        if (p != null && svnService != null) {
-            try {
-                if (!p.isLocal() && svnService.isSVNProject(p)) {
-                    brancesList.add(SVNConstant.NAME_TRUNK);
-                    String[] branchList = svnService.getBranchList(p);
-                    if (branchList != null) {
-                        brancesList.addAll(Arrays.asList(branchList));
-                    }
-
-                }
-            } catch (PersistenceException e) {
-                ExceptionHandler.process(e);
-            }
-        }
+        // ISVNProviderService svnService = getSVNService();
+        // if (p != null && svnService != null) {
+        // try {
+        // if (!p.isLocal() && svnService.isSVNProject(p)) {
+        // brancesList.add(SVNConstant.NAME_TRUNK);
+        // String[] branchList = svnService.getBranchList(p);
+        // if (branchList != null) {
+        // brancesList.addAll(Arrays.asList(branchList));
+        // }
+        //
+        // }
+        // } catch (PersistenceException e) {
+        // ExceptionHandler.process(e);
+        // }
+        // }
         return brancesList;
     }
 

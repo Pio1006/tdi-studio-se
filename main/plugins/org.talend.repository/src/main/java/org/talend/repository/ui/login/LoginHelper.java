@@ -69,7 +69,6 @@ import org.talend.core.repository.model.RepositoryFactoryProvider;
 import org.talend.core.runtime.CoreRuntimePlugin;
 import org.talend.core.services.ICoreTisService;
 import org.talend.core.services.IGITProviderService;
-import org.talend.core.services.ISVNProviderService;
 import org.talend.core.ui.branding.IBrandingConfiguration;
 import org.talend.core.ui.branding.IBrandingService;
 import org.talend.repository.ProjectManager;
@@ -119,7 +118,6 @@ public class LoginHelper {
 
     protected Shell usableShell;
 
-    protected ISVNProviderService svnProviderService;
 
     protected PreferenceManipulator prefManipulator;
 
@@ -158,14 +156,6 @@ public class LoginHelper {
     protected void init() {
         if (PluginChecker.isRemoteProviderPluginLoaded()) {
             GlobalServiceRegister gsr = GlobalServiceRegister.getDefault();
-            try {
-                if (gsr.isServiceRegistered(ISVNProviderService.class)) {
-                    svnProviderService = (ISVNProviderService) GlobalServiceRegister.getDefault()
-                            .getService(ISVNProviderService.class);
-                }
-            } catch (Exception e) {
-                ExceptionHandler.process(e);
-            }
             try {
                 if (gsr.isServiceRegistered(IGITProviderService.class)) {
                     gitProviderService = (IGITProviderService) GlobalServiceRegister.getDefault()
@@ -497,11 +487,6 @@ public class LoginHelper {
         }
         String lastUsedBranch = null;
         if (isRemoteConnection) {
-            if (svnProviderService != null) {
-                String projectUrl = svnProviderService.getProjectUrl(lastUsedProject);
-                String projectName = lastUsedProject.getTechnicalLabel();
-                lastUsedBranch = prefManipulator.getLastSVNBranch(projectUrl, projectName);
-            }
             List<String> branches = null;
             try {
                 /**

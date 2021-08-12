@@ -104,7 +104,6 @@ import org.talend.commons.ui.runtime.image.OverlayImageProvider;
 import org.talend.commons.utils.workbench.resources.ResourceUtils;
 import org.talend.core.CorePlugin;
 import org.talend.core.GlobalServiceRegister;
-import org.talend.core.PluginChecker;
 import org.talend.core.context.Context;
 import org.talend.core.context.RepositoryContext;
 import org.talend.core.language.ECodeLanguage;
@@ -137,7 +136,6 @@ import org.talend.core.repository.ui.editor.RepositoryEditorInput;
 import org.talend.core.runtime.repository.item.ItemProductKeys;
 import org.talend.core.runtime.util.ItemDateParser;
 import org.talend.core.services.ICreateXtextProcessService;
-import org.talend.core.services.ISVNProviderService;
 import org.talend.core.services.IUIRefresher;
 import org.talend.core.ui.CoreUIPlugin;
 import org.talend.core.ui.IJobletProviderService;
@@ -291,14 +289,6 @@ public abstract class AbstractMultiPageTalendEditor extends MultiPageEditorPart 
     public boolean revisionChanged = false;
 
     public String revisionNumStr = null;
-
-    protected static ISVNProviderService svnProviderService = null;
-
-    static {
-        if (GlobalServiceRegister.getDefault().isServiceRegistered(ISVNProviderService.class)) {
-            svnProviderService = GlobalServiceRegister.getDefault().getService(ISVNProviderService.class);
-        }
-    }
 
     @Override
     public void changePaletteComponentHandler() {
@@ -546,25 +536,12 @@ public abstract class AbstractMultiPageTalendEditor extends MultiPageEditorPart 
 
     private boolean isStorageVersionChanged(Item refreshedItem, Item currentItem) {
         boolean isChanged = false;
-        if (PluginChecker.isSVNProviderPluginLoaded()) {
-            if (svnProviderService != null && svnProviderService.isProjectInSvnMode()) {
-                Process refreshedProcess = new Process(refreshedItem.getProperty());
-                String refreshedNumStr = svnProviderService.getCurrentSVNRevision(refreshedProcess);
-                refreshedProcess.dispose();
-                if (refreshedNumStr != null) {
-                    refreshedNumStr = getFormattedRevisionNumStr(refreshedNumStr);
-                    if (!refreshedNumStr.equals(revisionNumStr)) {
-                        isChanged = true;
-                    }
-                }
-            }
-        } else {
-            Date currentModifiedDate = ItemDateParser.parseAdditionalDate(currentItem.getProperty(),
-                    ItemProductKeys.DATE.getModifiedKey());
-            Date refreshedModifiedDate = ItemDateParser.parseAdditionalDate(refreshedItem.getProperty(),
-                    ItemProductKeys.DATE.getModifiedKey());
-            isChanged = currentModifiedDate != null && !currentModifiedDate.equals(refreshedModifiedDate);
-        }
+
+        Date currentModifiedDate = ItemDateParser.parseAdditionalDate(currentItem.getProperty(),
+                ItemProductKeys.DATE.getModifiedKey());
+        Date refreshedModifiedDate = ItemDateParser.parseAdditionalDate(refreshedItem.getProperty(),
+                ItemProductKeys.DATE.getModifiedKey());
+        isChanged = currentModifiedDate != null && !currentModifiedDate.equals(refreshedModifiedDate);
         return isChanged;
     }
 

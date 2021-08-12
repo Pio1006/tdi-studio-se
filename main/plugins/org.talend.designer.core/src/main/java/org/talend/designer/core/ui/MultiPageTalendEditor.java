@@ -19,12 +19,10 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.talend.core.GlobalServiceRegister;
-import org.talend.core.PluginChecker;
 import org.talend.core.model.process.IProcess2;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.properties.JobletProcessItem;
 import org.talend.core.model.properties.Property;
-import org.talend.core.services.ISVNProviderService;
 import org.talend.core.ui.branding.IBrandingService;
 import org.talend.designer.core.i18n.Messages;
 import org.talend.designer.core.ui.editor.AbstractTalendEditor;
@@ -110,18 +108,6 @@ public class MultiPageTalendEditor extends AbstractMultiPageTalendEditor {
         String jobVersion = "0.1"; //$NON-NLS-1$
         if (process2 != null) {
             jobVersion = process2.getVersion();
-        }
-        // if (getActivePage() == 1) {
-        ISVNProviderService service = null;
-        if (PluginChecker.isSVNProviderPluginLoaded()) {
-            service = (ISVNProviderService) GlobalServiceRegister.getDefault().getService(ISVNProviderService.class);
-            if (revisionChanged && service.isProjectInSvnMode()) {
-                revisionNumStr = service.getCurrentSVNRevision(process2);
-                revisionChanged = false;
-                if (revisionNumStr != null) {
-                    revisionNumStr = ".r" + revisionNumStr; //$NON-NLS-1$
-                }
-            }
         }
         String title = "MultiPageTalendEditor.Job";//$NON-NLS-1$
         if (process2 != null) {

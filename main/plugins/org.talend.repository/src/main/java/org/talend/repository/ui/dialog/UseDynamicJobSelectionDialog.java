@@ -344,8 +344,6 @@ public class UseDynamicJobSelectionDialog extends Dialog {
                     return false;
                 }
                 return true;
-            } else if (contentType == ERepositoryObjectType.SVN_ROOT) {
-                return true;
             } else if (contentType == ERepositoryObjectType.REFERENCED_PROJECTS) {
                 return true;
             } else {

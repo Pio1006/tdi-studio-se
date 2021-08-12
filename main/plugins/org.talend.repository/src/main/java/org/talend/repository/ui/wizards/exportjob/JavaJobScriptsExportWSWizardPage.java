@@ -1166,13 +1166,7 @@ public class JavaJobScriptsExportWSWizardPage extends JavaJobScriptsExportWizard
         exportChoiceMap.put(ExportChoice.needTalendLibraries, Boolean.TRUE);
         exportChoiceMap.put(ExportChoice.needMetaInfo, true);
         exportChoiceMap.put(ExportChoice.binaries, true);
-        // TDQ-15391: when have tDqReportRun, must always export items.
-        if (EmfModelUtils.getComponentByName(getProcessItem(), "tDqReportRun") != null) { //$NON-NLS-1$
-            exportChoiceMap.put(ExportChoice.needJobItem, Boolean.TRUE);
-        } else {
-            exportChoiceMap.put(ExportChoice.needJobItem, Boolean.FALSE);
-        }
-        // TDQ-15391~
+        exportChoiceMap.put(ExportChoice.needJobItem, Boolean.FALSE);
         exportChoiceMap.put(ExportChoice.needSourceCode, Boolean.FALSE);
         exportChoiceMap.put(ExportChoice.needDependencies, Boolean.TRUE);
         exportChoiceMap.put(ExportChoice.needJobScript, Boolean.FALSE);
@@ -1206,13 +1200,7 @@ public class JavaJobScriptsExportWSWizardPage extends JavaJobScriptsExportWizard
         exportChoiceMap.put(ExportChoice.needSystemRoutine, Boolean.TRUE);
         exportChoiceMap.put(ExportChoice.needUserRoutine, Boolean.TRUE);
         exportChoiceMap.put(ExportChoice.needTalendLibraries, Boolean.TRUE);
-        // TDQ-15391: when have tDqReportRun, must always export items.
-        if (EmfModelUtils.getComponentByName(getProcessItem(), "tDqReportRun") != null) { //$NON-NLS-1$
-            exportChoiceMap.put(ExportChoice.needJobItem, Boolean.TRUE);
-        } else {
-            exportChoiceMap.put(ExportChoice.needJobItem, Boolean.FALSE);
-        }
-        // TDQ-15391~
+        exportChoiceMap.put(ExportChoice.needJobItem, Boolean.FALSE);
         exportChoiceMap.put(ExportChoice.needSourceCode, Boolean.FALSE);
         exportChoiceMap.put(ExportChoice.needDependencies, Boolean.TRUE);
         exportChoiceMap.put(ExportChoice.needJobScript, Boolean.FALSE);

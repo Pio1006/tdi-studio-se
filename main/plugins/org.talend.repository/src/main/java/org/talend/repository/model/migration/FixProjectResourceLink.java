@@ -54,8 +54,11 @@ public class FixProjectResourceLink extends AbstractItemMigrationTask {
         }
         String propertyPath = getPropertyPath(item);
         String path = item.getState().getPath();
-        if (item.getProperty().getAuthor().getLogin() != null && StringUtils.equals(path, propertyPath)) {
-            return ExecutionResult.NOTHING_TO_DO;
+        if (item.getProperty().getAuthor().getLogin() != null) {
+            if (org.apache.commons.lang.StringUtils.isBlank(path) && org.apache.commons.lang.StringUtils.isBlank(propertyPath)
+                    || StringUtils.equals(path, propertyPath)) {
+                return ExecutionResult.NOTHING_TO_DO;
+            }
         }
         if (StringUtils.isNotBlank(propertyPath) && !StringUtils.equals(path, propertyPath)) {
             item.getState().setPath(propertyPath);

@@ -11,12 +11,14 @@ COMPATIBILITY="ALL"
     STARTABLE="true"
 	PARTITIONING="AUTO"
   LOG4J_ENABLED="true"
+  
+  VISIBLE="false"
   >
     <SIGNATURE></SIGNATURE>
   </HEADER>
 
   <FAMILIES>
-    <FAMILY>Databases/DB Specifics/eXist</FAMILY>
+    <FAMILY>Deprecated</FAMILY>
   </FAMILIES>
 
   <DOCUMENTATION>

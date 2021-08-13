@@ -10,12 +10,14 @@
     RELEASE_DATE="20091023"
     STARTABLE="true"
     LOG4J_ENABLED="true"
+    
+    VISIBLE="false"
 	>
     <SIGNATURE/>
   </HEADER>
 
   <FAMILIES>
-    <FAMILY>Business_Intelligence/OLAP_Cube/Palo</FAMILY>
+    <FAMILY>Deprecated</FAMILY>
   </FAMILIES>
 
   <DOCUMENTATION>

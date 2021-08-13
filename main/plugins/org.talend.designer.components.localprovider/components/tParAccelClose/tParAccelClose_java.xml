@@ -10,12 +10,14 @@
     RELEASE_DATE="20100106A"
     STARTABLE="true"
     LOG4J_ENABLED="true"
+    
+    VISIBLE="false"
   >
     <SIGNATURE/>
   </HEADER>
 
   <FAMILIES>
-    <FAMILY>Databases/DB Specifics/ParAccel</FAMILY>
+    <FAMILY>Deprecated</FAMILY>
   </FAMILIES>
 
   <DOCUMENTATION>

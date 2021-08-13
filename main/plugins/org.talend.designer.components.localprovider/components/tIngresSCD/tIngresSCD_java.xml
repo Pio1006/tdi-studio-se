@@ -14,13 +14,14 @@
     EXTENSION="org.talend.designer.scd"
     HAS_CONDITIONAL_OUTPUTS="true"
 	PARTITIONING="AUTO"
+	
+	VISIBLE="false"
   >
     <SIGNATURE/>
   </HEADER>
 
   <FAMILIES>
-    <FAMILY>Databases/DB Specifics/Ingres</FAMILY>
-    <FAMILY>Business_Intelligence/DB_SCD</FAMILY>
+    <FAMILY>Deprecated</FAMILY>
   </FAMILIES>
 
   <DOCUMENTATION>

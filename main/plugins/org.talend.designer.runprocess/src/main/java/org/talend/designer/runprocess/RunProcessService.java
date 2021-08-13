@@ -558,4 +558,9 @@ public class RunProcessService implements IRunProcessService {
         delegateService.deleteOldVersionTalendJobProject(object);
     }
 
+    @Override
+    public void checkAndUpdateDaikonDependencies() {
+        delegateService.checkAndUpdateDaikonDependencies();
+    }
+
 }

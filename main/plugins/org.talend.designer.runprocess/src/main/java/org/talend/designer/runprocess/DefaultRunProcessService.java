@@ -1056,4 +1056,9 @@ public class DefaultRunProcessService implements IRunProcessService {
         TalendJavaProjectManager.deleteOldVersionTalendJobProject(object, true);
     }
 
+    @Override
+    public void checkAndUpdateDaikonDependencies() {
+        new AggregatorPomsHelper().checkAndUpdateDaikonDependencies();
+    }
+
 }

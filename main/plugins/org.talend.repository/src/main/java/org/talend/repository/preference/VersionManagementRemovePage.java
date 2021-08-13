@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.repository.preference;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -54,8 +55,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.internal.ide.IDEInternalPreferences;
-import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.talend.commons.exception.CommonExceptionHandler;
 import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.exception.PersistenceException;
@@ -599,7 +598,6 @@ public class VersionManagementRemovePage extends AbstractVersionManagementProjec
     }
     
     private void openInSystemExplorer(String fileLocation) {
-        String command = IDEWorkbenchPlugin.getDefault().getPreferenceStore().getString(IDEInternalPreferences.WORKBENCH_SYSTEM_EXPLORER);
         File dir = new File(fileLocation).getParentFile();
         Process p;
         try {
@@ -608,7 +606,10 @@ public class VersionManagementRemovePage extends AbstractVersionManagementProjec
             } else if (EnvironmentUtils.isMacOsSytem()) {
                 p = Runtime.getRuntime().exec("open -R " + fileLocation);
             } else {
-                p = Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", command},null, dir);
+                if (Desktop.isDesktopSupported()) {
+                    Desktop desktop = Desktop.getDesktop();
+                    desktop.open(dir);
+                }
             }
         } catch (IOException e1) {
             MessageBoxExceptionHandler.process(e1);

@@ -11,12 +11,14 @@
     RELEASE_DATE="20070312A"
     STARTABLE="true"
 	PARTITIONING="AUTO"
+	
+	VISIBLE="false"
   >
     <SIGNATURE/>
   </HEADER>
 
   <FAMILIES>
-    <FAMILY>Business/Open Bravo</FAMILY>
+    <FAMILY>Deprecated</FAMILY>
   </FAMILIES>
 
   <DOCUMENTATION>

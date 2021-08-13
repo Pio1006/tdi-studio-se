@@ -10,12 +10,14 @@
     RELEASE_DATE="20100308A"
     STARTABLE="false"
 	PARTITIONING="NONE"
+	
+	VISIBLE="false"
   >
     <SIGNATURE/>
   </HEADER>
 
   <FAMILIES>
-    <FAMILY>Databases/DB Specifics/Ingres</FAMILY>
+    <FAMILY>Deprecated</FAMILY>
   </FAMILIES>
 
   <DOCUMENTATION>

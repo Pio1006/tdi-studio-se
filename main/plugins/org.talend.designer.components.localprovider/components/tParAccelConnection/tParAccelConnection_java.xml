@@ -11,13 +11,14 @@
     RELEASE_DATE="20070319A"
     STARTABLE="true"
     LOG4J_ENABLED="true"
+    
+    VISIBLE="false"
   >
     <SIGNATURE/>
   </HEADER>
 
   <FAMILIES>
-    <FAMILY>Databases/DB Specifics/ParAccel</FAMILY>
-    <FAMILY>ELT/Connections</FAMILY>
+    <FAMILY>Deprecated</FAMILY>
   </FAMILIES>
 
   <DOCUMENTATION>

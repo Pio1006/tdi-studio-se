@@ -28,10 +28,10 @@ imports="
 	    }
 	    
 		public void setURL(INode node) {
+			final String jdbcURL = "jdbc:mysql";
 %>
 <%@ include file="@{org.talend.designer.components.localprovider}/components/templates/Mysql/jdbcurl4basic.javajet"%>
 <%
-	        }		
 		}
 		
 		public String getDirverClassName(INode node){

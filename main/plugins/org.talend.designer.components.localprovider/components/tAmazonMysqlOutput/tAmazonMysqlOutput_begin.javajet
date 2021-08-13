@@ -159,6 +159,7 @@ if(useExistingConnection) {
 	String javaDbDriver   = "org.gjt.mm.mysql.Driver";
 	
 	final boolean supportBulkComponent = false;
+	final String jdbcURL = "jdbc:mysql";
 	%>
 	
 	<%@ include file="@{org.talend.designer.components.localprovider}/components/templates/Mysql/jdbcurl4connection_output.javajet"%>

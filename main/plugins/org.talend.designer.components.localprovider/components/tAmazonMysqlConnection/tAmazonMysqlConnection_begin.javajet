@@ -12,6 +12,7 @@ imports="
 		public void createURL(INode node) {
 			super.createURL(node);
 			final boolean supportBulkComponent = false;
+			final String jdbcURL = "jdbc:mysql";
 %>
 <%@ include file="@{org.talend.designer.components.localprovider}/components/templates/Mysql/jdbcurl4connection_output.javajet"%>
 <%	

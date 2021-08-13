@@ -91,7 +91,7 @@ if(inputSchema != null && inputSchema.size() > 0 && outputSchema != null && outp
 		
 		<%@ include file="@{org.talend.designer.components.localprovider}/components/templates/password.javajet"%>
 	   	
-        java.sql.Connection connection_<%=cid%> = java.sql.DriverManager.getConnection(connectionString_<%=cid %>, <%=dbuser%>, decryptedPassword_<%=cid%>);
+        java.sql.Connection connection_<%=cid%> = java.sql.DriverManager.getConnection(url_<%=cid %>, <%=dbuser%>, decryptedPassword_<%=cid%>);
         <%        
     }
     %>

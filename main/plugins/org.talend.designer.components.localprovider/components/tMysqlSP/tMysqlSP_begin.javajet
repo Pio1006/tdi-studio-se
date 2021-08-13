@@ -73,9 +73,9 @@ if(useExistingConn) {
 
     java.lang.Class.forName("<%=drverClass%>");
     <%dbLog.conn().logJDBCDriver(dbLog.str(drverClass));%>
-    <%dbLog.conn().connTry(dbLog.var("connectionString"), dbLog.var("dbUser"));%>
+    <%dbLog.conn().connTry(dbLog.var("url"), dbLog.var("dbUser"));%>
     connection_<%=cid%> = java.sql.DriverManager.getConnection(url_<%=cid%>, dbUser_<%=cid%>, dbPwd_<%=cid%>);
-    <%dbLog.conn().connDone(dbLog.var("connectionString"));%>
+    <%dbLog.conn().connDone(dbLog.var("url"));%>
     <%
 	if(specify_alias){
 	%>

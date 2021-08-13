@@ -33,6 +33,7 @@
 	</repositories>
 	<modules>
 		<module>main/features/org.talend.designer.feature</module>
+		<module>main/features/org.talend.gmf.feature</module>
         <module>main/features/org.talend.fragment.jars.di.feature</module>
 		<module>main/features/org.talend.rcp.branding.tos.feature</module>
 		<module>main/features/org.talend.rcp.branding.tos.test.feature</module>

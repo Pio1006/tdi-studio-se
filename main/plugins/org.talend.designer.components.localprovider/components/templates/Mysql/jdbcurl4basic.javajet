@@ -15,7 +15,7 @@
                 properties_<%=cid%> += "&enabledTLSProtocols=TLSv1.2,TLSv1.1,TLSv1";
             }
         }
-        String url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + <%=dbproperties%>;
+        String url_<%=cid%> = "<%=jdbcURL%>://" + <%=dbhost%> + ":" + <%=dbport%> + "/" + <%=dbname%> + "?" + properties_<%=cid%>;
 <%
     }
 %>

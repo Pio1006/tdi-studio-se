@@ -2429,7 +2429,7 @@ if(columnList != null && columnList.size() > 0) {
         <%
         boolean useExistingConnection = "true".equals(ElementParameterParser.getValue(node,"__USE_EXISTING_CONNECTION__"));
         if(!useExistingConnection) {
-            if(("MYSQL").equals(dbType) {
+            if("MYSQL".equals(dbType)) {
                 String dbproperties = ElementParameterParser.getValue(node,"__PROPERTIES__");
                 String dbhost = ElementParameterParser.getValue(node, "__HOST__");
                 String dbport = ElementParameterParser.getValue(node, "__PORT__");

@@ -23,6 +23,7 @@ import org.talend.core.model.migration.AbstractJobMigrationTask;
 import org.talend.core.model.properties.Item;
 import org.talend.core.model.properties.ProcessItem;
 import org.talend.core.model.relationship.RelationshipItemBuilder;
+import org.talend.core.model.repository.ERepositoryObjectType;
 import org.talend.core.model.repository.IRepositoryViewObject;
 import org.talend.core.model.repository.RepositoryObject;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
@@ -38,6 +39,15 @@ public class AutoUpdateRelationsMigrationTask extends AbstractJobMigrationTask {
 
     public AutoUpdateRelationsMigrationTask() {
         rM = ProxyRepositoryFactory.getInstance().getRepositoryFactoryFromProvider().getResourceManager();
+    }
+
+    @Override
+    public ExecutionResult execute(Project project, Item item) {
+        if (!getAllTypes().contains(ERepositoryObjectType.getItemType(item))) {
+            return ExecutionResult.NOTHING_TO_DO;
+        }
+        setProject(project);
+        return execute(item);
     }
 
     @Override

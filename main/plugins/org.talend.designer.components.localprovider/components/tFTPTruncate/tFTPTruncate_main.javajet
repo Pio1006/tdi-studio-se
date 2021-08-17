@@ -129,12 +129,15 @@
 <%
 				}
 %>
-				org.apache.commons.net.ftp.FTPFile[] filesInDirectory_<%=cid%> = null;
+				String[] filesInDirectory_<%=cid%> = null;
 				boolean getFileNamesFailed_<%=cid%> = false;
 				try {
-					filesInDirectory_<%=cid%> = ftp_<%=cid %>.listFiles();
+					filesInDirectory_<%=cid%> = ftp_<%=cid %>.listNames();
+					if(filesInDirectory_<%=cid%> == null){
+					    getFileNamesFailed_<%=cid%> = true;
+					}
 				} catch(java.io.IOException e_<%=cid%>) {
-globalMap.put("<%=cid%>_ERROR_MESSAGE",e_<%=cid%>.getMessage());
+                    globalMap.put("<%=cid%>_ERROR_MESSAGE",e_<%=cid%>.getMessage());
 					getFileNamesFailed_<%=cid%> = true;
 <%
 					if(isLog4jEnabled) {
@@ -159,11 +162,9 @@ globalMap.put("<%=cid%>_ERROR_MESSAGE",e_<%=cid%>.getMessage());
 %>
 				} else {
 					<% /*search files matches to filemask and truncate them*/ %>
-					for (org.apache.commons.net.ftp.FTPFile file_<%=cid %> : filesInDirectory_<%=cid%>) {
-						String fileName_<%=cid%> = file_<%=cid %>.getName();
+					for (String fileName_<%=cid %> : filesInDirectory_<%=cid%>) {
 						if (fileName_<%=cid%>.matches(mask<%=cid %>)) {
 							boolean successTruncated_<%=cid %> = false;
-								if (file_<%=cid %>.isFile()) {
 									successTruncated_<%=cid %> = ftp_<%=cid %>.storeFile(fileName_<%=cid%>, new java.io.ByteArrayInputStream(new byte[]{}));
 									if (successTruncated_<%=cid %>) {
 										globalMap.put("<%=cid %>_CURRENT_STATUS", "File truncate OK.");
@@ -182,7 +183,6 @@ globalMap.put("<%=cid%>_ERROR_MESSAGE",e_<%=cid%>.getMessage());
 										globalMap.put("<%=cid %>_CURRENT_STATUS", "File truncate fail.");
 										throw new RuntimeException(errorMessageDeleteFail);
 									}
-								}
 							}
 					}
 				}

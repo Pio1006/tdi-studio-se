@@ -289,6 +289,13 @@ if (sftp) {// *** sftp *** //
     }
 
     ftpFiles_<%=cid %> = ftp_<%=cid %>.listFiles();
+	<%if(!dirFull){%>
+	String[] nameLists_<%=cid %> = ftp_<%=cid %>.listNames();
+	List<String> nameListsTemp_<%=cid %> = new java.util.ArrayList<>();
+	<%}%>
+	
+
+
 <%
     if ("true".equals(useExistingConn) && !moveToCurrentDir) {
 %>
@@ -300,31 +307,40 @@ if (sftp) {// *** sftp *** //
     <%/*prepare masks*/ %>
     for (String filemask_<%=cid %> : maskList_<%=cid %>) {
         java.util.regex.Pattern fileNamePattern_<%=cid %> = java.util.regex.Pattern.compile(filemask_<%=cid %>.replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*"));
-
+	
+<%if(!dirFull){%>
+        if(nameLists_<%=cid %> != null){
+            for (String ftpFile_<%=cid %> : nameLists_<%=cid %>) {
+                if (fileNamePattern_<%=cid %>.matcher(ftpFile_<%=cid %>).matches()) {
+                    nameListsTemp_<%=cid %>.add(ftpFile_<%=cid %>);
+                }
+            }
+        }
+<%}else{%>
         for (org.apache.commons.net.ftp.FTPFile ftpFile_<%=cid %> : ftpFiles_<%=cid %>) {
-            if (fileNamePattern_<%=cid %>.matcher(ftpFile_<%=cid %>.getName()).matches()) {
+		String ftpFileName_<%=cid %> = ftpFile_<%=cid %>.getName();
+            if (ftpFileName_<%=cid %>!=null && fileNamePattern_<%=cid %>.matcher(ftpFileName_<%=cid %>).matches()) {
                 fileListTemp_<%=cid %>.add(ftpFile_<%=cid %>);
             }
         }
+		<%}%>
     }
 
     String currentFilePath_<%=cid%> = remotedir_<%=cid %>;
     if(!remotedir_<%=cid%>.endsWith("/")&&!remotedir_<%=cid%>.endsWith("\\")){
         currentFilePath_<%=cid%> += "/";
     }
+<%if(!dirFull){%>
+    for (String ftpFile_<%=cid %> : nameListsTemp_<%=cid %>) {
+        String currentFileName_<%=cid%> = ftpFile_<%=cid %>;
+
+<%}else{%>
 
     for (org.apache.commons.net.ftp.FTPFile ftpFile_<%=cid %> : fileListTemp_<%=cid %>) {
         String currentFileName_<%=cid%> = null;
-<%
-        if (dirFull) {
-%>
             currentFileName_<%=cid%> = ftpFile_<%=cid %>.toString();
 <%
-        } else {
-%>
-            currentFileName_<%=cid%> = ftpFile_<%=cid %>.getName();
-<%
-        }
+}
 
         if(isLog4jEnabled) {
 %>
@@ -334,8 +350,14 @@ if (sftp) {// *** sftp *** //
 %> 
         <%/*set to globalMap*/ %>
         globalMap.put("<%=cid %>_CURRENT_FILE", currentFileName_<%=cid%>);
+		<%if(!dirFull){%>
+        globalMap.put("<%=cid %>_CURRENT_FILEPATH", currentFilePath_<%=cid%> + currentFileName_<%=cid%>);
+
+<%}else{%>
         globalMap.put("<%=cid %>_CURRENT_FILEPATH", currentFilePath_<%=cid%> + ftpFile_<%=cid %>.getName());
+		<%}%>
         nb_file_<%=cid %>++;
+
 <%
 } //end common code part
 %>

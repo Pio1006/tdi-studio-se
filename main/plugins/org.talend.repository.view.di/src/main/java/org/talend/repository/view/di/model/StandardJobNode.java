@@ -23,8 +23,10 @@ import org.talend.repository.view.di.i18n.Messages;
  */
 public class StandardJobNode extends StableRepositoryNode {
 
+    public static final String STANDARD_NODE_LABEL = Messages.getString("StandardJobNode_Label");
+
     public StandardJobNode(RepositoryNode parent) {
-        super(parent, Messages.getString("StandardJobNode_Label"), ECoreImage.PROCESS_STANDARD_GENERIC_CATEGORY_CLOSE_ICON); //$NON-NLS-1$
+        super(parent, STANDARD_NODE_LABEL, ECoreImage.PROCESS_STANDARD_GENERIC_CATEGORY_CLOSE_ICON); // $NON-NLS-1$
         setType(ENodeType.SYSTEM_FOLDER);
         setProperties(EProperties.LABEL, ERepositoryObjectType.PROCESS);
         setProperties(EProperties.CONTENT_TYPE, ERepositoryObjectType.PROCESS);

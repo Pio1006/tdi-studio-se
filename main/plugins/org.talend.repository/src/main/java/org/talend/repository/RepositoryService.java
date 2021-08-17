@@ -1031,4 +1031,13 @@ public class RepositoryService implements IRepositoryService, IRepositoryContext
         return UpdateLog4jJarUtils.getLog4j2Modules();
     }
 
+    @Override
+    public String getStandardNodeLabel() {
+        ICoreTisService coreTisService = ICoreTisService.get();
+        if (coreTisService != null) {
+            return coreTisService.getStandardNodeLabel();
+        }
+        return "Standard";
+    }
+
 }

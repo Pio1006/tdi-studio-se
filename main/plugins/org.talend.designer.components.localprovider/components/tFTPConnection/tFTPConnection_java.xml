@@ -89,6 +89,7 @@
       REQUIRED="true"
       NUM_ROW="4"
       REPOSITORY_VALUE="PASSWORD"
+      NOT_SHOW_IF="((SFTP=='true') AND (AUTH_METHOD == 'PUBLICKEY'))"
     >
       <DEFAULT>""</DEFAULT>
     </PARAMETER>

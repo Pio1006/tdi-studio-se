@@ -17,6 +17,10 @@
     <import plugin="net.jeeeyul.eclipse.themes" version="0.0.0" match="greaterOrEqual"/>
     <import plugin="net.jeeeyul.swtend" version="0.0.0" match="greaterOrEqual"/>
     <import plugin="org.apache.axis" version="0.0.0" match="greaterOrEqual"/>
+    <import plugin="org.eclipse.gmf.runtime.draw2d.ui" version="0.0.0" match="greaterOrEqual"/>
+    <import plugin="org.eclipse.gmf.runtime.common.core" version="0.0.0" match="greaterOrEqual"/>
+    <import plugin="org.eclipse.gmf.runtime.common.ui" version="0.0.0" match="greaterOrEqual"/>
+    
   </requires>  
   <plugin id="org.talend.designer.codegen" download-size="0" install-size="0" version="0.0.0"/>
   <plugin id="org.talend.designer.core" download-size="0" install-size="0" version="0.0.0" unpack="false"/>

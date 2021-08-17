@@ -44,7 +44,11 @@ skeleton="../templates/db_output_bulk.skeleton"
 
     boolean useBatchSize = ("true").equals(ElementParameterParser.getValue(node,"__USE_BATCH_SIZE__"));
     String batchSize=ElementParameterParser.getValue(node,"__BATCH_SIZE__");
-
+    
+    boolean setQueryTimeOut = "true".equals(ElementParameterParser.getValue(node,"__SET_QUERY_TIMEOUT__"));
+	
+	String queryTimeOutInSeconds = ElementParameterParser.getValue(node,"__QUERY_TIMEOUT_IN_SECONDS__");
+    
     //feature:2880
     getManager(dbmsId, cid, node);
     boolean whereSupportNull = ElementParameterParser.getValue(node, "__SUPPORT_NULL_WHERE__").equals("true");
@@ -232,9 +236,28 @@ skeleton="../templates/db_output_bulk.skeleton"
     if(("true").equals(identityInsert)) {
         %>
         stmt_<%=cid %> = conn_<%=cid%>.createStatement();
+<%
+		if(setQueryTimeOut) {
+%>
+	    	stmt_<%=cid %>.setQueryTimeout(Integer.valueOf(<%= queryTimeOutInSeconds %>));
+<%
+		}
+%>
         stmt_<%=cid %>.execute("SET IDENTITY_INSERT "+ tableName_<%=cid%> +" ON");
         <%
     }
+	if(setQueryTimeOut && ("INSERT").equals(dataAction) || ("UPDATE").equals(dataAction) 
+			|| ("DELETE").equals(dataAction) || ("INSERT_OR_UPDATE").equals(dataAction)) {
+%>
+		pstmt_<%=cid %>.setQueryTimeout(Integer.valueOf(<%= queryTimeOutInSeconds %>));
+<%
+	}
+	if(setQueryTimeOut && ("UPDATE_OR_INSERT").equals(dataAction) || ("INSERT_OR_UPDATE").equals(dataAction)) {
+%>
+		pstmtUpdate_<%=cid %>.setQueryTimeout(Integer.valueOf(<%= queryTimeOutInSeconds %>));
+		pstmtInsert_<%=cid %>.setQueryTimeout(Integer.valueOf(<%= queryTimeOutInSeconds %>));
+<%
+	}
 }
         %>
         }

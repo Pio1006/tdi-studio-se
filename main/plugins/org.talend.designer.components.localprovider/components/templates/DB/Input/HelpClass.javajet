@@ -146,9 +146,16 @@ imports="
 		}
 		
 		public void createStatement(INode node) {
+			boolean setQueryTimeOut = "true".equals(ElementParameterParser.getValue(node,"__SET_QUERY_TIMEOUT__"));
+			String queryTimeOutInSeconds = ElementParameterParser.getValue(node,"__QUERY_TIMEOUT_IN_SECONDS__");
 %>
 			java.sql.Statement stmt_<%=cid %> = conn_<%=cid%>.createStatement();
 <%
+			if(setQueryTimeOut) {
+%>
+				stmt_<%=cid %>.setQueryTimeout(Integer.valueOf(<%= queryTimeOutInSeconds %>));
+<%
+			}
 		}
 		public void createMinValueStatement(INode node){
 %>

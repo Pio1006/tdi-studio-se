@@ -72,7 +72,11 @@ skeleton="../templates/db_output_bulk.skeleton"
     String batchSize=ElementParameterParser.getValue(node,"__BATCH_SIZE__");
 
     boolean useActiveDirectoryAuth = "true".equals(ElementParameterParser.getValue(node, "__ACTIVE_DIR_AUTH__"));
-
+    
+    boolean setQueryTimeOut = "true".equals(ElementParameterParser.getValue(node,"__SET_QUERY_TIMEOUT__"));
+	
+	String queryTimeOutInSeconds = ElementParameterParser.getValue(node,"__QUERY_TIMEOUT_IN_SECONDS__");
+    
     String rejectConnName = null;
     List<? extends IConnection> rejectConns = node.getOutgoingConnections("REJECT");
     if(rejectConns != null && rejectConns.size() > 0) {
@@ -201,14 +205,18 @@ if(!isDynamic) {
     StringBuilder updateSetStmt = actionSQLMap.get(UPDATE_SET_STMT);
     StringBuilder updateWhereStmt = actionSQLMap.get(UPDATE_WHERE_STMT);
     StringBuilder deleteWhereStmt = actionSQLMap.get(DELETE_WHERE_STMT);
-
+    %>
+    java.sql.PreparedStatement pstmt_<%=cid %> = null;
+    java.sql.PreparedStatement pstmtInsert_<%=cid %> = null;
+    java.sql.PreparedStatement pstmtUpdate_<%=cid %> = null;
+    <%
     if(("INSERT").equals(dataAction)) {
         %>
         String insert_<%=cid%> = "INSERT INTO [" + tableName_<%=cid%> + "] (<%=insertColName.toString()%>) VALUES (<%=insertValueStmt.toString()%>)";
 <%
 //to fixed: bug8422
 if(!usingStatsLogs){%>
-        java.sql.PreparedStatement pstmt_<%=cid %> = conn_<%=cid%>.prepareStatement(insert_<%=cid%>);
+        pstmt_<%=cid %> = conn_<%=cid%>.prepareStatement(insert_<%=cid%>);
         resourceMap.put("pstmt_<%=cid %>", pstmt_<%=cid %>);
 <%}%>
 
@@ -216,7 +224,6 @@ if(!usingStatsLogs){%>
 //to fixed: bug8422
 //to fixed: bug18928,in bug 8422 if a statement is created,it will be used for many times,but it's not thread-safty.Now give one statement for each thread.
 if(usingStatsLogs){ %>
-        java.sql.PreparedStatement pstmt_<%=cid %> = null;
         String keyPsmt_<%=cid %> = conn_<%=cid%> + "[psmt]" + "[" + <%=table%> + "]";
         pstmt_<%=cid %> = SharedDBPreparedStatement.getSharedPreparedStatement(conn_<%=cid%>,insert_<%=cid%>,keyPsmt_<%=cid%>);
         resourceMap.put("pstmt_<%=cid %>", pstmt_<%=cid %>);
@@ -225,41 +232,41 @@ if(usingStatsLogs){ %>
     } else if (("UPDATE").equals(dataAction)) {
         %>
         String update_<%=cid%> = "UPDATE [" + tableName_<%=cid%> + "] SET <%=updateSetStmt.toString()%> WHERE <%=updateWhereStmt.toString()%>";
-        java.sql.PreparedStatement pstmt_<%=cid %> = conn_<%=cid%>.prepareStatement(update_<%=cid%>);
+        pstmt_<%=cid %> = conn_<%=cid%>.prepareStatement(update_<%=cid%>);
         resourceMap.put("pstmt_<%=cid %>", pstmt_<%=cid %>);
         <%
     } else if (("INSERT_OR_UPDATE").equals(dataAction)) {
         %>
-        java.sql.PreparedStatement pstmt_<%=cid %> = conn_<%=cid%>.prepareStatement("SELECT COUNT(1) FROM [" + tableName_<%=cid%> + "] WHERE <%=updateWhereStmt.toString()%>");
+        pstmt_<%=cid %> = conn_<%=cid%>.prepareStatement("SELECT COUNT(1) FROM [" + tableName_<%=cid%> + "] WHERE <%=updateWhereStmt.toString()%>");
         resourceMap.put("pstmt_<%=cid %>", pstmt_<%=cid %>);
         String insert_<%=cid%> = "INSERT INTO [" + tableName_<%=cid%> + "] (<%=insertColName.toString()%>) VALUES (<%=insertValueStmt.toString()%>)";
-        java.sql.PreparedStatement pstmtInsert_<%=cid %> = conn_<%=cid%>.prepareStatement(insert_<%=cid%>);
+        pstmtInsert_<%=cid %> = conn_<%=cid%>.prepareStatement(insert_<%=cid%>);
         resourceMap.put("pstmtInsert_<%=cid %>", pstmtInsert_<%=cid %>);
         String update_<%=cid%> = "UPDATE [" + tableName_<%=cid%> + "] SET <%=updateSetStmt.toString()%> WHERE <%=updateWhereStmt.toString()%>";
-        java.sql.PreparedStatement pstmtUpdate_<%=cid %> = conn_<%=cid%>.prepareStatement(update_<%=cid%>);
+        pstmtUpdate_<%=cid %> = conn_<%=cid%>.prepareStatement(update_<%=cid%>);
         resourceMap.put("pstmtUpdate_<%=cid %>", pstmtUpdate_<%=cid %>);
         <%
     } else if (("UPDATE_OR_INSERT").equals(dataAction)) {
         %>
         String update_<%=cid%> = "UPDATE [" + tableName_<%=cid%> + "] SET <%=updateSetStmt.toString()%> WHERE <%=updateWhereStmt.toString()%>";
-        java.sql.PreparedStatement pstmtUpdate_<%=cid %> = conn_<%=cid%>.prepareStatement(update_<%=cid%>);
+        pstmtUpdate_<%=cid %> = conn_<%=cid%>.prepareStatement(update_<%=cid%>);
         resourceMap.put("pstmtUpdate_<%=cid %>", pstmtUpdate_<%=cid %>);
         String insert_<%=cid%> = "INSERT INTO [" + tableName_<%=cid%> + "] (<%=insertColName.toString()%>) VALUES (<%=insertValueStmt.toString()%>)";
-        java.sql.PreparedStatement pstmtInsert_<%=cid %> = conn_<%=cid%>.prepareStatement(insert_<%=cid%>);
+        pstmtInsert_<%=cid %> = conn_<%=cid%>.prepareStatement(insert_<%=cid%>);
         resourceMap.put("pstmtInsert_<%=cid %>", pstmtInsert_<%=cid %>);
         <%
     } else if (("DELETE").equals(dataAction)) {
         %>
         String delete_<%=cid%> = "DELETE FROM [" + tableName_<%=cid%> + "] WHERE <%=deleteWhereStmt.toString()%>";
-        java.sql.PreparedStatement pstmt_<%=cid %> = conn_<%=cid%>.prepareStatement(delete_<%=cid%>);
+        pstmt_<%=cid %> = conn_<%=cid%>.prepareStatement(delete_<%=cid%>);
         resourceMap.put("pstmt_<%=cid %>", pstmt_<%=cid %>);
         <%
     } else if (("INSERT_IF_NOT_EXIST").equals(dataAction)) {
     	%>
-        java.sql.PreparedStatement pstmt_<%=cid %> = conn_<%=cid%>.prepareStatement("SELECT COUNT(1) FROM [" + tableName_<%=cid%> + "] WHERE <%=updateWhereStmt.toString()%>");
+        pstmt_<%=cid %> = conn_<%=cid%>.prepareStatement("SELECT COUNT(1) FROM [" + tableName_<%=cid%> + "] WHERE <%=updateWhereStmt.toString()%>");
         resourceMap.put("pstmt_<%=cid %>", pstmt_<%=cid %>);
         String insert_<%=cid%> = "INSERT INTO [" + tableName_<%=cid%> + "] (<%=insertColName.toString()%>) VALUES (<%=insertValueStmt.toString()%>)";
-        java.sql.PreparedStatement pstmtInsert_<%=cid %> = conn_<%=cid%>.prepareStatement(insert_<%=cid%>);
+        pstmtInsert_<%=cid %> = conn_<%=cid%>.prepareStatement(insert_<%=cid%>);
         resourceMap.put("pstmtInsert_<%=cid %>", pstmtInsert_<%=cid %>);
     <%
     }else if("SINGLE_INSERT".equals(dataAction)){
@@ -328,7 +335,7 @@ if(usingStatsLogs){ %>
 
 	String insert_<%=cid%> = "INSERT INTO "+<%=table%>+" (<%=insertColName.toString()%>) VALUES " + extendInsertValueStmt_<%=cid%>.toString();
 
-	java.sql.PreparedStatement pstmt_<%=cid %> =  conn_<%=cid%>.prepareStatement(insert_<%=cid%>);
+	pstmt_<%=cid %> =  conn_<%=cid%>.prepareStatement(insert_<%=cid%>);
     resourceMap.put("pstmt_<%=cid %>", pstmt_<%=cid %>);
 
     String insertColName<%=cid%> = "<%=insertColName.toString()%>";
@@ -351,8 +358,13 @@ if(usingStatsLogs){ %>
  	}
     if(identityInsert) {
         %>
-        java.sql.Statement stmt_<%=cid %> = conn_<%=cid%>.createStatement();
+        stmt_<%=cid %> = conn_<%=cid%>.createStatement();
         <%
+        if(setQueryTimeOut) {
+        %>
+        	stmt_<%=cid %>.setQueryTimeout(Integer.valueOf(<%= queryTimeOutInSeconds %>));
+        <%
+        }
         if(!isDynamic){
     
             if (useExistingConnection) {
@@ -368,6 +380,22 @@ if(usingStatsLogs){ %>
             }
         }
     }
+    if(setQueryTimeOut && ("INSERT").equals(dataAction) || ("UPDATE").equals(dataAction) || ("DELETE").equals(dataAction) 
+    		|| ("INSERT_OR_UPDATE").equals(dataAction) || ("INSERT_IF_NOT_EXIST").equals(dataAction) || ("SINGLE_INSERT").equals(dataAction)) {
+%>
+		pstmt_<%=cid %>.setQueryTimeout(Integer.valueOf(<%= queryTimeOutInSeconds %>));
+<%
+	}
+	if(setQueryTimeOut && ("UPDATE_OR_INSERT").equals(dataAction) || ("INSERT_OR_UPDATE").equals(dataAction) || ("INSERT_IF_NOT_EXIST").equals(dataAction)) {
+		if(("UPDATE_OR_INSERT").equals(dataAction) || ("INSERT_OR_UPDATE").equals(dataAction)) {
+%>
+			pstmtUpdate_<%=cid %>.setQueryTimeout(Integer.valueOf(<%= queryTimeOutInSeconds %>));
+<%
+		}
+%>
+		pstmtInsert_<%=cid %>.setQueryTimeout(Integer.valueOf(<%= queryTimeOutInSeconds %>));
+<%
+	}
 }
 if(isDynamic) {
 %>

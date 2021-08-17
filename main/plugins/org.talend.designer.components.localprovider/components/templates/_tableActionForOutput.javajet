@@ -19,14 +19,6 @@ if (!isParallelize) {
     }
 
     boolean useCascade = "true".equals(ElementParameterParser.getValue(node,"__USE_CASCADE__"));
-    
-    //bugfix: TDI-31650
-    boolean setQueryTimeOut = false;
-    String queryTimeOutInSeconds = null;
-    if(SYBASE.equalsIgnoreCase(dbmsId)){
-        setQueryTimeOut = "true".equals(ElementParameterParser.getValue(node,"__SET_QUERY_TIMEOUT__"));
-        queryTimeOutInSeconds = ElementParameterParser.getValue(node,"__QUERY_TIMEOUT_IN_SECONDS__");
-    }
 
     if(!("NONE").equals(tableAction)) {
         if(("DROP_CREATE").equals(tableAction)) {
@@ -35,7 +27,7 @@ if (!isParallelize) {
             <%
                if(setQueryTimeOut){
                     %>
-                              stmtDrop_<%=cid%>.setQueryTimeout(Integer.valueOf(Integer.valueOf(<%= queryTimeOutInSeconds %>)));
+                              stmtDrop_<%=cid%>.setQueryTimeout(Integer.valueOf(<%= queryTimeOutInSeconds %>));
                     <%
                }
              %>

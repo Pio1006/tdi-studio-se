@@ -322,6 +322,23 @@
 		NUM_ROW="20">
 		  <DEFAULT>false</DEFAULT>
 	</PARAMETER>
+	
+	<PARAMETER
+      NAME="SET_QUERY_TIMEOUT"
+      FIELD="CHECK"
+      NUM_ROW="30"
+      >
+      <DEFAULT>false</DEFAULT>
+    </PARAMETER>
+
+    <PARAMETER
+      NAME="QUERY_TIMEOUT_IN_SECONDS"
+      FIELD="TEXT"
+      NUM_ROW="30"
+      SHOW_IF="SET_QUERY_TIMEOUT == 'true'"
+      >
+      <DEFAULT>30</DEFAULT>
+    </PARAMETER>
 
   </ADVANCED_PARAMETERS>
 

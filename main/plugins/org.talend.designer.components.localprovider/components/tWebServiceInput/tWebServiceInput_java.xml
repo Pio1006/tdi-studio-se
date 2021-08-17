@@ -221,7 +221,7 @@ for(int i = 0; i &lt; result.length; i++){
 				MODULE="commons-discovery-0.2.jar" MVN="mvn:org.talend.libraries/commons-discovery-0.2/6.0.0"  UrlPath="platform:/plugin/org.talend.libraries.apache.common/lib/commons-discovery-0.2.jar" REQUIRED_IF="(API=='AXIS')" />
 			<IMPORT NAME="SOAP-logging" MODULE="commons-logging-1.1.jar" MVN="mvn:org.talend.libraries/commons-logging-1.1/6.0.0"  UrlPath="platform:/plugin/org.talend.libraries.apache.common/lib/commons-logging-1.1.jar"
 				REQUIRED_IF="(API=='AXIS')" />
-			<IMPORT NAME="COMMONSHTTPCLIENT" MODULE="commons-httpclient-3.1.jar" MVN="mvn:commons-httpclient/commons-httpclient/3.1"  UrlPath="platform:/plugin/org.talend.libraries.apache.http/lib/commons-httpclient-3.1.jar"
+			<IMPORT NAME="COMMONSHTTPCLIENT" MODULE="commons-httpclient-3.1.jar" MVN="mvn:commons-httpclient/commons-httpclient/3.1" 
 				REQUIRED_IF="(API=='AXIS')" />
 			
 			<!-- common jars both used for axis1 and cxf -->

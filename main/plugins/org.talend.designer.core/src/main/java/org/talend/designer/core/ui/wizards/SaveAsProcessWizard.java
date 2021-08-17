@@ -199,6 +199,7 @@ public class SaveAsProcessWizard extends Wizard {
             }
         };
         rwu.setAvoidUnloadResources(true);
+        rwu.setAvoidSvnUpdate(true);
         repositoryFactory.executeRepositoryWorkUnit(rwu);
     }
 

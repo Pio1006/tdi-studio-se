@@ -135,8 +135,7 @@ public class AddDistributionClosedListForHadoopComponentsMigrationTask extends
 							|| "APACHE_1_0_0".equals(para.getValue())
 							|| "APACHE_0_20_203".equals(para.getValue())) {
 						ComponentUtilities.setNodeValue(node, name, "APACHE");
-					} else if ("CLOUDERA_0.20_CDH3U1".equals(para.getValue())
-							|| "Cloudera_CDH4".equalsIgnoreCase(para.getValue())) {
+					} else if ("CLOUDERA_0.20_CDH3U1".equals(para.getValue())) {
 						ComponentUtilities.setNodeValue(node, name, "CLOUDERA");
 					} else if ("MAPR".equals(para.getValue())) {
 						ComponentUtilities.setNodeValue(node, name, "MAPR");

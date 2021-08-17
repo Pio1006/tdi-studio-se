@@ -1170,7 +1170,7 @@ public class DbGenerationManagerTest extends DbGenerationManagerTestHelper {
         lookupTableContext.setType("String");
         String query = dbManager.buildSqlSelect(dbMapComponent, schema + "." + outTable1);
         String expectedQuery = "\"UPDATE dbo.tar\n" + "SET tarColumn = A.id,\n" + "tarColumn1 = A.name\n"
-                + "FROM \" +dbo+\".\"+src1+ \" A , \" +dbo+\".\"+src2+ \" B\n" + "WHERE\n" + "  B.id = A.id\"";
+                + "FROM\n \" +dbo+\".\"+src1+ \" A INNER JOIN  \" +dbo+\".\"+src2+ \" B " + "ON(" + "  B.id = A.id )\"";
 
         assertEquals(expectedQuery, query);
     }
@@ -1578,8 +1578,8 @@ public class DbGenerationManagerTest extends DbGenerationManagerTestHelper {
         lookupTableContext.setValue("lookupTable");
         lookupTableContext.setType("String");
         String query = dbManager.buildSqlSelect(dbMapComponent, schema + "." + outTable1);
-        String expectedQuery = "\"UPDATE ABC\n" + "SET tarColumn = A.id,\n" + "tarColumn1 = A.name\n"
-                + "FROM \" +dbo+\".\"+src1+ \" A , \" +dbo+\".\"+src2+ \" B\n" + "WHERE\n" + "  B.id = A.id\"";
+        String expectedQuery = "\"UPDATE dbo.tar\n" + "SET tarColumn = A.id,\n" + "tarColumn1 = A.name\n"
+                + "FROM\n \" +dbo+\".\"+src1+ \" A INNER JOIN  \" +dbo+\".\"+src2+ \" B " + "ON(" + "  B.id = A.id )\"";
         assertEquals(expectedQuery, query);
     }
 
@@ -1713,8 +1713,8 @@ public class DbGenerationManagerTest extends DbGenerationManagerTestHelper {
         lookupTableContext.setValue("lookupTable");
         lookupTableContext.setType("String");
         String query = dbManager.buildSqlSelect(dbMapComponent, schema + "." + outTable1);
-        String expectedQuery = "\"UPDATE ABC A\n" + "SET tarColumn = A.id,\n" + "tarColumn1 = A.name\n"
-                + "FROM \" +dbo+\".\"+src1+ \" A , \" +dbo+\".\"+src2+ \" B\n" + "WHERE\n" + "  B.id = A.id\"";
+        String expectedQuery = "\"UPDATE dbo.tar\n" + "SET tarColumn = A.id,\n" + "tarColumn1 = A.name\n"
+                + "FROM\n \" +dbo+\".\"+src1+ \" A INNER JOIN  \" +dbo+\".\"+src2+ \" B " + "ON(" + "  B.id = A.id )\"";
         assertEquals(expectedQuery, query);
     }
 
@@ -1849,7 +1849,7 @@ public class DbGenerationManagerTest extends DbGenerationManagerTestHelper {
         lookupTableContext.setType("String");
         String query = dbManager.buildSqlSelect(dbMapComponent, schema + "." + outTable1);
         String expectedQuery = "\"UPDATE dbo.tar\n" + "SET tarColumn = A.id,\n" + "tarColumn1 = A.name\n"
-                + "FROM \" +dbo+\".\"+src1+ \" A , \" +dbo+\".\"+src2+ \" B\n" + "WHERE\n" + "  B.id = A.id\"";
+                + "FROM\n \" +dbo+\".\"+src1+ \" A INNER JOIN  \" +dbo+\".\"+src2+ \" B " + "ON(" + "  B.id = A.id )\"";
         assertEquals(expectedQuery, query);
     }
 
@@ -1882,8 +1882,8 @@ public class DbGenerationManagerTest extends DbGenerationManagerTestHelper {
         init4ELTMapUpdate(schema, main_table, main_alias, lookup_table, lookup_alias, outTable1);
         String query = dbManager.buildSqlSelect(dbMapComponent, schema + "." + outTable1);
         String expectedQuery = "\"UPDATE \" +context.schema+ \".tar\n" + "SET tarColumn = A.id,\n" + "tarColumn1 = A.name\n"
-                + "FROM \" +context.schema+\".\"+context.src1+ \" A , \" +context.schema+\".\"+src2+ \" B\n" + "WHERE\n"
-                + "  B.id = A.id\"";
+                + "FROM\n \" +context.schema+\".\"+context.src1+ \" A INNER JOIN  \" +context.schema+\".\"+src2+ \" B "
+                + "ON(" + "  B.id = A.id )\"";
 
         assertEquals(expectedQuery, query);
     }
@@ -1900,8 +1900,8 @@ public class DbGenerationManagerTest extends DbGenerationManagerTestHelper {
         init4ELTMapUpdate(schema, main_table, main_alias, lookup_table, lookup_alias, outTable1);
         String query = dbManager.buildSqlSelect(dbMapComponent, schema + "." + outTable1);
         String expectedQuery = "\"UPDATE \" +context.schema+ \".tar\n" + "SET tarColumn = A.id,\n" + "tarColumn1 = A.name\n"
-                + "FROM \" +context.schema+\".\"+context.src1+ \" A , \" +context.schema+\".\"+context.src2+ \" B\n" + "WHERE\n"
-                + "  B.id = A.id\"";
+                + "FROM\n \" +context.schema+\".\"+context.src1+ \" A INNER JOIN  \" +context.schema+\".\"+context.src2+ \" B "
+                + "ON(" + "  B.id = A.id )\"";
 
         assertEquals(expectedQuery, query);
     }
@@ -1919,8 +1919,8 @@ public class DbGenerationManagerTest extends DbGenerationManagerTestHelper {
         String query = dbManager.buildSqlSelect(dbMapComponent, schema + "." + outTable1);
         String expectedQuery = "\"UPDATE \" +context.schema+ \".\" +context.tar+ \"\n" + "SET tarColumn = A.id,\n"
                 + "tarColumn1 = A.name\n"
-                + "FROM \" +context.schema+\".\"+context.src1+ \" A , \" +context.schema+\".\"+context.src2+ \" B\n" + "WHERE\n"
-                + "  B.id = A.id\"";
+                + "FROM\n \" +context.schema+\".\"+context.src1+ \" A INNER JOIN  \" +context.schema+\".\"+context.src2+ \" B "
+                + "ON(" + "  B.id = A.id )\"";
 
         assertEquals(expectedQuery, query);
     }

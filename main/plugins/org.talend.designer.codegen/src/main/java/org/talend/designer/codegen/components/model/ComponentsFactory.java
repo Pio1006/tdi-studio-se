@@ -689,14 +689,16 @@ public class ComponentsFactory implements IComponentsFactory {
     }
 
     private void waitForInit() {
+        if (!isInitializing.get()) {
+            return;
+        }
         init(false);
         int spent = 0;
         int time = 1000;
         int timeout = 1000 * 60 * 10;
-        Thread thread = Thread.currentThread();
         while (isInitializing.get()) {
             try {
-                thread.sleep(time);
+                Thread.sleep(time);
                 spent += time;
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

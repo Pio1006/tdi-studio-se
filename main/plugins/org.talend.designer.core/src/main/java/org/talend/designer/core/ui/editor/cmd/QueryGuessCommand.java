@@ -411,7 +411,8 @@ public class QueryGuessCommand extends Command {
             if (dbType == null) {
                 // TDQ-15039: for the unknown JDBC type connection, make sure we can generate the correct query.
                 // at least for BigQuery, the QUOTATION_MARK is the same with mysql.
-                if (driverJarName.contains("BigQuery") || driverClassName.contains("BigQuery")) {
+                if ((driverJarName != null && driverJarName.contains("BigQuery"))
+                        || (driverClassName != null && driverClassName.contains("BigQuery"))) {
                     dbType = EDatabaseTypeName.MYSQL.getDisplayName();
                 } else {
                     // if we can not get the DB Type from the existing driver list, just set back the type to ORACLE

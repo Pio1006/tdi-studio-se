@@ -264,6 +264,10 @@ public abstract class AbstractBuildJobHandler implements IBuildJobHandler, IBuil
             }
 
         }
+        
+        if (isOptionChoosed(ExportChoice.buildImage) || isOptionChoosed(ExportChoice.pushImage)) {
+        	otherArgsBuffer.append("-Dmaven.deploy.skip=true" + " ");  //$NON-NLS-1$ //$NON-NLS-2$
+        }
 
         if (!isOptionChoosed(ExportChoice.executeTests)) {
             otherArgsBuffer.append(TalendMavenConstants.ARG_SKIPTESTS);

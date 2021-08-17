@@ -60,8 +60,6 @@ public class ChangePigVersionOfPigLoadMigrationTask extends AbstractJobMigration
                                 if (ept != null) {
                                     if ("CLOUDERA_0.20_CDH3U1".equals(ept.getValue())) {//$NON-NLS-1$
                                         ComponentUtilities.setNodeValue(node, "PIG_VERSION", "Cloudera_0_20_CDH3U1"); //$NON-NLS-1$//$NON-NLS-2$
-                                    } else if ("CLOUDERA_CDH4".equals(ept.getValue())) {//$NON-NLS-1$
-                                        ComponentUtilities.setNodeValue(node, "PIG_VERSION", "Cloudera_CDH4");//$NON-NLS-1$//$NON-NLS-2$
                                     } else if ("MAPR".equals(ept.getValue())) {//$NON-NLS-1$
                                         ComponentUtilities.setNodeValue(node, "PIG_VERSION", "MapR");//$NON-NLS-1$//$NON-NLS-2$
                                     } else if ("MAPR2".equals(ept.getValue())) {//$NON-NLS-1$

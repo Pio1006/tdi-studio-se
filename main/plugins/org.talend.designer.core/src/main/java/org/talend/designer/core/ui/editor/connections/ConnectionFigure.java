@@ -108,10 +108,10 @@ public class ConnectionFigure extends PolylineConnectionEx implements IMapMode {
         PolygonDecoration targetDecoration = new PolygonDecoration();
         targetDecoration.setScale(1, 1);
         template.addPoint(new Point(-11, -5.5));
-        template.addPoint(new Point(-2, -5.5));
+        template.addPoint(new Point(-5, -5.5));
         template.addPoint(0, -1);
         template.addPoint(0, 1);
-        template.addPoint(new Point(-2, 5.5));
+        template.addPoint(new Point(-5, 5.5));
         template.addPoint(new Point(-11, 5.5));
         targetDecoration.setTemplate(template);
         setTargetDecoration(targetDecoration);
@@ -121,12 +121,11 @@ public class ConnectionFigure extends PolylineConnectionEx implements IMapMode {
         template = new PointList();
 
         template.addPoint(new Point(0, 5.5));
-        template.addPoint(new Point(-9, 5.5));
+        template.addPoint(new Point(-6, 5.5));
         template.addPoint(-11, 1);
         template.addPoint(-11, -1);
-        template.addPoint(new Point(-9, -5.5));
+        template.addPoint(new Point(-6, -5.5));
         template.addPoint(new Point(0, -5.5));
-
         sourceDecoration.setTemplate(template);
         setSourceDecoration(sourceDecoration);
     }
